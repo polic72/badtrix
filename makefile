@@ -1,5 +1,5 @@
 PROG = badtrix
-OBJS = $(PROG).o matrix.o
+OBJS = $(PROG).o matrix.o vector.o
 
 DOC = html
 
