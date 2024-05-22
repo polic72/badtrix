@@ -7,7 +7,7 @@
 
 typedef struct vector {
     double *values;
-    unsigned int n;
+    size_t n;
 } vector;
 
 

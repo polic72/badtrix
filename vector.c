@@ -115,6 +115,7 @@ bool vector_dot(double *dot, const vector *a, const vector *b)
 }
 
 
+//Need to do more work on matrix to do this fully, but I assure you that it WILL be cursed as hell.
 bool vector_cross(vector *dest, ...)
 {
 //    if (a->n != b->n)
