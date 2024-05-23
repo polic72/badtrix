@@ -13,15 +13,12 @@ typedef struct vector {
 
 //Mathematic Operations:
 bool vector_add_value(vector *dest, const vector *a, double x);
-
 bool vector_add_vector(vector *dest, const vector *a, const vector *b);
 
 bool vector_subtract_value(vector *dest, const vector *a, double x);
-
 bool vector_subtract_vector(vector *dest, const vector *a, const vector *b);
 
 bool vector_multiply_value(vector *dest, const vector *a, double x);
-
 bool vector_dot(double *dot, const vector *a, const vector *b);
 bool vector_cross(vector *dest, ...);
 
