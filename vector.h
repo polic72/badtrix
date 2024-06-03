@@ -6,8 +6,8 @@
 
 
 typedef struct vector {
-    double *values;
     size_t n;
+    double *values;
 } vector;
 
 
@@ -24,5 +24,8 @@ bool vector_cross(vector *dest, ...);
 
 //Transform Operations:
 vector *vector_skewSymetric(vector *a);
+
+//Other Operations:
+size_t vector_to_str(char* output, size_t output_size, vector* v);
 
 #endif //VECTOR_H

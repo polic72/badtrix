@@ -1,5 +1,5 @@
 PROG = badtrix
-OBJS = $(PROG).o matrix.o vector.o
+OBJS = $(PROG).o extras.o matrix.o vector.o
 
 DOC = html
 
@@ -13,7 +13,7 @@ all : $(PROG)
 
 
 $(PROG) : $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(PROG) $(LIBS) -Wall
+	$(CC) $(CFLAGS) $(OBJS) -o $(PROG) $(LIBS) -Wall -lm
 
 $(DOC) : Doxyfile *.c
 	doxygen
