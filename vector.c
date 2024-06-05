@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "extras.h"
 #include "vector.h"
@@ -147,77 +148,169 @@ size_t vector_to_str(char* output, size_t output_size, vector* v)
 
         double_nice_str_10dec(temp_num, 32, v->values[i]);
 
-        printf("%s\n", temp_num);
+        short num_size = strlen(temp_num);
+
+        if (num_size > max_size)
+        {
+            max_size = num_size;
+        }
     }
 
-    return 0;
-//
-//    if (max_size == -1)
-//    {
-//        switch (output_size)
-//        {
-//            case 0:
-//                return 0;
-//
-//
-//            case 1:
-//                output[0] = '|';
-//                return 1;
-//
-//
-//            case 2:
-//                output[0] = '|';
-//                output[1] = ' ';
-//                return 2;
-//
-//
-//            case 3:
-//                output[0] = '|';
-//                output[1] = ' ';
-//                output[2] = ' ';
-//                return 3;
-//
-//
-//            case 4:
-//                output[0] = '|';
-//                output[1] = ' ';
-//                output[2] = ' ';
-//                output[3] = '|';
-//                return 4;
-//
-//
-//            default:
-//                output[0] = '|';
-//                output[1] = ' ';
-//                output[2] = ' ';
-//                output[3] = '|';
-//                return 4;
-//        }
-//    }
-//
-//
-//    size_t counter = 0;
-//
-//    for (size_t i = 0; i < v->n; ++i)
-//    {
-//        output[counter] = '|';
-//        counter++;
-//
-//        if (counter >= output_size)
-//        {
-//            return counter;
-//        }
-//
-//
-//        output[counter] = ' ';
-//        counter++;
-//
-//        if (counter >= output_size)
-//        {
-//            return counter;
-//        }
-//
-//
-//        //
-//    }
+
+    //Just a quick hardcode for 0-length vectors.
+    if (max_size == -1)
+    {
+        switch (output_size)
+        {
+            case 0:
+                return 0;
+
+
+            case 1:
+                output[0] = '|';
+                return 1;
+
+
+            case 2:
+                output[0] = '|';
+                output[1] = ' ';
+                return 2;
+
+
+            case 3:
+                output[0] = '|';
+                output[1] = ' ';
+                output[2] = ' ';
+                return 3;
+
+
+            case 4:
+                output[0] = '|';
+                output[1] = ' ';
+                output[2] = ' ';
+                output[3] = '|';
+                return 4;
+
+
+            default:
+                output[0] = '|';
+                output[1] = ' ';
+                output[2] = ' ';
+                output[3] = '|';
+                return 4;
+        }
+    }
+
+
+    size_t counter = 0;
+
+    for (size_t i = 0; i < v->n; ++i)
+    {
+        output[counter] = '|';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        output[counter] = ' ';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        char temp_num[32];
+
+        double_nice_str_10dec(temp_num, 32, v->values[i]);
+
+        short num_size = strlen(temp_num);
+        short half_size = (max_size - num_size) / 2;
+
+        short left_pad = half_size + (((max_size - num_size) % 2 == 1) ? 1 : 0);
+        short right_pad = half_size;
+
+
+        for (short j = 0; j < left_pad; ++j)
+        {
+            output[counter] = ' ';
+            counter++;
+
+            if (counter >= output_size)
+            {
+                return counter;
+            }
+        } 
+
+
+        size_t num_start = counter;
+
+        while (counter - num_start < 32)
+        {
+            output[counter] = temp_num[counter - num_start];
+            counter++;
+
+            if (counter >= output_size)
+            {
+                return counter;
+            }
+
+            if (temp_num[counter - num_start] == '\0')
+            {
+                break;
+            }
+        }
+
+
+        for (short j = 0; j < right_pad; ++j)
+        {
+            output[counter] = ' ';
+            counter++;
+
+            if (counter >= output_size)
+            {
+                return counter;
+            }
+        } 
+
+
+        output[counter] = ' ';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        output[counter] = '|';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        if (i != v->n - 1)
+        {
+            output[counter] = '\n';
+            counter++;
+
+            if (counter >= output_size)
+            {
+                return counter;
+            }
+        }
+    }
+
+
+    output[counter] = '\0';
+    counter++;
+
+    return counter;
 }

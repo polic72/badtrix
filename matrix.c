@@ -1,7 +1,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
+#include "extras.h"
 #include "matrix.h"
 
 
@@ -226,5 +228,188 @@ bool matrix_transpose(matrix* dest, matrix* a)
 
 size_t matrix_to_str(char* output, size_t output_size, matrix* a)
 {
-    //
+    int max_sizes[a->n];
+
+    for (size_t c = 0; c < a->n; ++c)
+    {
+        max_sizes[c] = -1;
+    }
+
+    for (size_t r = 0; r < a->m; ++r)
+    {
+        for (size_t c = 0; c < a->n; ++c)
+        {
+            char temp_num[32];
+
+            double_nice_str_10dec(temp_num, 32, a->values[r * a->n + c]);
+
+            short num_size = strlen(temp_num);
+
+            if (num_size > max_sizes[c])
+            {
+                max_sizes[c] = num_size;
+            }
+        }
+    }
+
+
+    //Just a quick hardcode for 0-size matrices.
+    if (a->m == 0 || a->n == 0)
+    {
+        switch (output_size)
+        {
+            case 0:
+                return 0;
+
+
+            case 1:
+                output[0] = '|';
+                return 1;
+
+
+            case 2:
+                output[0] = '|';
+                output[1] = ' ';
+                return 2;
+
+
+            case 3:
+                output[0] = '|';
+                output[1] = ' ';
+                output[2] = ' ';
+                return 3;
+
+
+            case 4:
+                output[0] = '|';
+                output[1] = ' ';
+                output[2] = ' ';
+                output[3] = '|';
+                return 4;
+
+
+            default:
+                output[0] = '|';
+                output[1] = ' ';
+                output[2] = ' ';
+                output[3] = '|';
+                return 4;
+        }
+    }
+
+
+    size_t counter = 0;
+
+    for (size_t r = 0; r < a->m; ++r)
+    {
+        output[counter] = '|';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        output[counter] = ' ';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        for (size_t c = 0; c < a->n; ++c)
+        {
+            char temp_num[32];
+
+            double_nice_str_10dec(temp_num, 32, a->values[r * a->n + c]);
+
+            short num_size = strlen(temp_num);
+            short half_size = (max_sizes[c] - num_size) / 2;
+
+            short left_pad = half_size + (((max_sizes[c] - num_size) % 2 == 1) ? 1 : 0) + ((c == 0) ? 0 : 1);
+            short right_pad = half_size + ((c == a->n - 1) ? 0 : 1);
+
+
+            for (short i = 0; i < left_pad; ++i)
+            {
+                output[counter] = ' ';
+                counter++;
+
+                if (counter >= output_size)
+                {
+                    return counter;
+                }
+            } 
+
+
+            size_t num_start = counter;
+
+            while (counter - num_start < 32)
+            {
+                output[counter] = temp_num[counter - num_start];
+                counter++;
+
+                if (counter >= output_size)
+                {
+                    return counter;
+                }
+
+                if (temp_num[counter - num_start] == '\0')
+                {
+                    break;
+                }
+            }
+
+
+            for (short i = 0; i < right_pad; ++i)
+            {
+                output[counter] = ' ';
+                counter++;
+
+                if (counter >= output_size)
+                {
+                    return counter;
+                }
+            } 
+        }
+
+
+        output[counter] = ' ';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        output[counter] = '|';
+        counter++;
+
+        if (counter >= output_size)
+        {
+            return counter;
+        }
+
+
+        if (r != a->m - 1)
+        {
+            output[counter] = '\n';
+            counter++;
+
+            if (counter >= output_size)
+            {
+                return counter;
+            }
+        }
+    }
+
+
+    output[counter] = '\0';
+    counter++;
+
+    return counter;
 }
