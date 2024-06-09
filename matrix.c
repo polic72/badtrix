@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -7,6 +8,7 @@
 #include "matrix.h"
 
 
+//Mathematic Operations:
 bool matrix_add_value(matrix* dest, matrix* a, double x)
 {
     if (dest->m != a->m && dest->n != a->n)
@@ -173,28 +175,321 @@ bool matrix_multiply_vector(vector* dest, matrix* a, vector* v)
 }
 
 
-//bool matrix_adjoint(matrix* dest, matrix* a)
-//{
-//
-//}
-//
-//
-//bool matrix_cofactors(matrix* dest, matrix* a)
-//{
-//
-//}
-//
-//
-//bool matrix_inverse(matrix* dest, matrix* a)
-//{
-//
-//}
-//
-//
-//bool matrix_minors(matrix* dest, matrix* a)
-//{
-//
-//}
+//Sub Operations:
+bool matrix_determinant(double* dest, matrix* a)
+{
+    if (a->m != a->n)
+    {
+        return false;
+    }
+
+
+    switch (a->m)
+    {
+        case 0:
+            return false;
+
+
+        case 1:
+            *dest = a->values[0];
+            return true;
+
+
+        case 2:
+            *dest = a->values[0] * a->values[3] - a->values[1] * a->values[2];
+            return true;
+
+
+        case 3:
+            *dest = a->values[0] * (a->values[4] * a->values[8]) + a->values[1] * (a->values[5] * a->values[6]) 
+                + a->values[2] * (a->values[3] * a->values[7]) 
+                - (a->values[6] * (a->values[4] * a->values[2]) + a->values[7] * (a->values[5] * a->values[0]) 
+                        + a->values[8] * a->values[3] * a->values[1]);
+            return true;
+    }
+
+
+    double old = *dest;
+    *dest = 0;
+
+    for (size_t c = 0; c < a->n; ++c)
+    {
+        double temp;
+        if (!matrix_get_cofactor(&temp, a, 0, c))
+        {
+            *dest = old;
+            return false;
+        }
+        
+        *dest += a->values[c] * temp;
+    }
+
+
+    return true;
+}
+
+
+bool matrix_get_cofactor(double* dest, matrix* a, size_t row, size_t column)
+{
+    if (!matrix_get_minor(dest, a, row, column))
+    {
+        return false;
+    }
+
+
+    if (row % 2 == 1 ^ column % 2 == 1)
+    {
+        *dest *= -1;
+    }
+
+
+    return true;
+}
+
+
+bool matrix_get_minor(double* dest, matrix* a, size_t row, size_t column)
+{
+    if (row < 0 || row >= a->m)
+    {
+        return false;
+    }
+
+    if (column < 0 || column >= a->n)
+    {
+        return false;
+    }
+
+
+    matrix minor_matrix;
+    minor_matrix.values = malloc((a->m - 1) * (a->n - 1) * sizeof(double));
+    minor_matrix.m = a->m - 1;
+    minor_matrix.n = a->n - 1;
+
+    if (!matrix_get_submatrix(&minor_matrix, a, row, column))
+    {
+        return false;
+    }
+
+    matrix_determinant(dest, &minor_matrix);
+
+    free(minor_matrix.values);
+
+
+    return true;
+}
+
+
+bool matrix_get_submatrix(matrix* dest, matrix* a, size_t row, size_t column)
+{
+    if (dest->m != a->m - 1)
+    {
+        return false;
+    }
+
+    if (dest->n != a->n - 1)
+    {
+        return false;
+    }
+
+
+    if (row < 0 || row >= a->m)
+    {
+        return false;
+    }
+
+    if (column < 0 || column >= a->n)
+    {
+        return false;
+    }
+
+
+    for (size_t r = 0; r < a->m; ++r)
+    {
+        if (r == row)
+        {
+            continue;
+        }
+
+        for (size_t c = 0; c < a->n; ++c)
+        {
+            if (c == column)
+            {
+                continue;
+            }
+
+            size_t r_t = (r < row) ? r : r - 1;
+            size_t c_t = (c < column) ? c : c - 1;
+
+            dest->values[r_t * dest->n + c_t] = a->values[r * a->n + c];
+        }
+    }
+
+
+    return true;
+}
+
+
+bool matrix_get_submatrix_range(matrix* dest, matrix* a, size_t start_row, size_t start_column, size_t end_row, size_t end_column)
+{
+    size_t r_diff = end_row - start_row;
+    size_t c_diff = end_column - start_column;
+
+    if (r_diff < 0)
+    {
+        return false;
+    }
+
+    if (c_diff < 0)
+    {
+        return false;
+    }
+
+
+    if (dest->m != r_diff)
+    {
+        return false;
+    }
+
+    if (dest->n != c_diff)
+    {
+        return false;
+    }
+
+
+    if (start_row < 0)
+    {
+        return false;
+    }
+
+    if (end_row >= a->m)
+    {
+        return false;
+    }
+    
+
+    if (start_column < 0)
+    {
+        return false;
+    }
+
+    if (end_column >= a->n)
+    {
+        return false;
+    }
+
+
+    for (size_t r = start_row; r < end_row; ++r)
+    {
+        for (size_t c = start_column; c < end_column; ++c)
+        {
+            dest->values[(r - start_row) * c_diff + (c - start_column)] = a->values[r * a->n + c];
+        }
+    }
+
+
+    return true;
+}
+
+
+//Transform Operations:
+bool matrix_adjoint(matrix* dest, matrix* a)
+{
+    if (!matrix_of_cofactors(dest, a))
+    {
+        return false;
+    }
+
+
+    matrix_transpose(dest, dest);
+
+
+    return true;
+}
+
+
+bool matrix_of_cofactors(matrix* dest, matrix* a)
+{
+    if (dest->m != a->m)
+    {
+        return false;
+    }
+
+    if (dest->n != a->n)
+    {
+        return false;
+    }
+
+
+    for (size_t r = 0; r < a->m; ++r)
+    {
+        for (size_t c = 0; c < a->n; ++c)
+        {
+            if (!matrix_get_cofactor(dest->values + r * a->n + c, a, r, c))
+            {
+                return false;
+            }
+        }
+    }
+    
+
+    return true;
+}
+
+
+bool matrix_inverse(matrix* dest, matrix* a)
+{
+    if (!matrix_adjoint(dest, a))
+    {
+        return false;
+    }
+
+
+    double determinant = 0;
+
+    for (size_t rc = 0; rc < dest->m; ++rc)
+    {
+        //Here it's the r...
+        double val = dest->values[rc * dest->n];
+
+        //...and here it's the c.
+        determinant += val * a->values[rc];
+    }
+
+
+    matrix_multiply_value(dest, dest, 1 / determinant);
+
+
+    return true;
+}
+
+
+bool matrix_of_minors(matrix* dest, matrix* a)
+{
+    if (dest->m != a->m)
+    {
+        return false;
+    }
+
+    if (dest->n != a->n)
+    {
+        return false;
+    }
+
+
+    for (size_t r = 0; r < a->m; ++r)
+    {
+        for (size_t c = 0; c < a->n; ++c)
+        {
+            if (!matrix_get_minor(dest->values + r * a->n + c, a, r, c))
+            {
+                return false;
+            }
+        }
+    }
+    
+
+    return true;
+}
 
 
 bool matrix_transpose(matrix* dest, matrix* a)
@@ -226,6 +521,7 @@ bool matrix_transpose(matrix* dest, matrix* a)
 }
 
 
+//Other Operations:
 size_t matrix_to_str(char* output, size_t output_size, matrix* a)
 {
     int max_sizes[a->n];
