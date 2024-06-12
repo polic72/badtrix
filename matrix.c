@@ -1,15 +1,15 @@
-#include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
 
 #include "extras.h"
 #include "matrix.h"
 
 
 //Mathematic Operations:
-bool matrix_add_value(matrix* dest, matrix* a, double x)
+bool matrix_add_value(matrix* dest, const matrix* a, double x)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -29,7 +29,7 @@ bool matrix_add_value(matrix* dest, matrix* a, double x)
 }
 
 
-bool matrix_add_matrix(matrix* dest, matrix* a, matrix* b)
+bool matrix_add_matrix(matrix* dest, const matrix* a, matrix* b)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -54,7 +54,7 @@ bool matrix_add_matrix(matrix* dest, matrix* a, matrix* b)
 }
 
 
-bool matrix_subtract_value(matrix* dest, matrix* a, double x)
+bool matrix_subtract_value(matrix* dest, const matrix* a, double x)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -74,7 +74,7 @@ bool matrix_subtract_value(matrix* dest, matrix* a, double x)
 }
 
 
-bool matrix_subtract_matrix(matrix* dest, matrix* a, matrix* b)
+bool matrix_subtract_matrix(matrix* dest, const matrix* a, matrix* b)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -99,7 +99,7 @@ bool matrix_subtract_matrix(matrix* dest, matrix* a, matrix* b)
 }
 
 
-bool matrix_multiply_value(matrix* dest, matrix* a, double x)
+bool matrix_multiply_value(matrix* dest, const matrix* a, double x)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -118,7 +118,7 @@ bool matrix_multiply_value(matrix* dest, matrix* a, double x)
 }
 
 
-bool matrix_multiply_matrix(matrix* dest, matrix* a, matrix* b)
+bool matrix_multiply_matrix(matrix* dest, const matrix* a, matrix* b)
 {
     if (dest->m != a->m && dest->n != b->n)
     {
@@ -148,7 +148,7 @@ bool matrix_multiply_matrix(matrix* dest, matrix* a, matrix* b)
 }
 
 
-bool matrix_multiply_vector(vector* dest, matrix* a, vector* v)
+bool matrix_multiply_vector(vector* dest, const matrix* a, vector* v)
 {
     if (dest->n != a->m)
     {
@@ -176,7 +176,7 @@ bool matrix_multiply_vector(vector* dest, matrix* a, vector* v)
 
 
 //Sub Operations:
-bool matrix_determinant(double* dest, matrix* a)
+bool matrix_determinant(double* dest, const matrix* a)
 {
     if (a->m != a->n)
     {
@@ -229,7 +229,7 @@ bool matrix_determinant(double* dest, matrix* a)
 }
 
 
-bool matrix_get_cofactor(double* dest, matrix* a, size_t row, size_t column)
+bool matrix_get_cofactor(double* dest, const matrix* a, size_t row, size_t column)
 {
     if (!matrix_get_minor(dest, a, row, column))
     {
@@ -247,7 +247,48 @@ bool matrix_get_cofactor(double* dest, matrix* a, size_t row, size_t column)
 }
 
 
-bool matrix_get_minor(double* dest, matrix* a, size_t row, size_t column)
+bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t column)
+{
+    if (row < 0 || row >= a->m)
+    {
+        return false;
+    }
+
+    if (column < 0 || column >= a->n)
+    {
+        return false;
+    }
+
+
+    double negative_s_spot = a->values[row * a->n + column];
+    double c_spot = a->values[column * a->n + column];
+
+    double denominator = sqrt(negative_s_spot * negative_s_spot + c_spot * c_spot);
+
+    double negative_s = negative_s_spot / denominator;
+    double c = c_spot / denominator;
+
+
+    for (size_t r = 0; r < givens->m; ++r)
+    {
+        for (size_t c = 0; c < givens->n; ++c)
+        {
+            givens->values[r * givens->n + c] = (r == c) ? 1 : 0;
+        }
+    }
+
+    givens->values[row * givens->n + column] = -negative_s;
+    givens->values[column * givens->n + row] = negative_s;
+
+    givens->values[row * givens->n + row] = c;
+    givens->values[column * givens->n + column] = c;
+
+
+    return true;
+}
+
+
+bool matrix_get_minor(double* dest, const matrix* a, size_t row, size_t column)
 {
     if (row < 0 || row >= a->m)
     {
@@ -279,7 +320,7 @@ bool matrix_get_minor(double* dest, matrix* a, size_t row, size_t column)
 }
 
 
-bool matrix_get_submatrix(matrix* dest, matrix* a, size_t row, size_t column)
+bool matrix_get_submatrix(matrix* dest, const matrix* a, size_t row, size_t column)
 {
     if (dest->m != a->m - 1)
     {
@@ -329,7 +370,7 @@ bool matrix_get_submatrix(matrix* dest, matrix* a, size_t row, size_t column)
 }
 
 
-bool matrix_get_submatrix_range(matrix* dest, matrix* a, size_t start_row, size_t start_column, size_t end_row, size_t end_column)
+bool matrix_get_submatrix_range(matrix* dest, const matrix* a, size_t start_row, size_t start_column, size_t end_row, size_t end_column)
 {
     size_t r_diff = end_row - start_row;
     size_t c_diff = end_column - start_column;
@@ -392,7 +433,7 @@ bool matrix_get_submatrix_range(matrix* dest, matrix* a, size_t start_row, size_
 
 
 //Transform Operations:
-bool matrix_adjoint(matrix* dest, matrix* a)
+bool matrix_adjoint(matrix* dest, const matrix* a)
 {
     if (!matrix_of_cofactors(dest, a))
     {
@@ -407,7 +448,34 @@ bool matrix_adjoint(matrix* dest, matrix* a)
 }
 
 
-bool matrix_of_cofactors(matrix* dest, matrix* a)
+bool matrix_inverse(matrix* dest, const matrix* a)
+{
+    if (!matrix_adjoint(dest, a))
+    {
+        return false;
+    }
+
+
+    double determinant = 0;
+
+    for (size_t rc = 0; rc < dest->m; ++rc)
+    {
+        //Here it's the r...
+        double val = dest->values[rc * dest->n];
+
+        //...and here it's the c.
+        determinant += val * a->values[rc];
+    }
+
+
+    matrix_multiply_value(dest, dest, 1 / determinant);
+
+
+    return true;
+}
+
+
+bool matrix_of_cofactors(matrix* dest, const matrix* a)
 {
     if (dest->m != a->m)
     {
@@ -436,34 +504,7 @@ bool matrix_of_cofactors(matrix* dest, matrix* a)
 }
 
 
-bool matrix_inverse(matrix* dest, matrix* a)
-{
-    if (!matrix_adjoint(dest, a))
-    {
-        return false;
-    }
-
-
-    double determinant = 0;
-
-    for (size_t rc = 0; rc < dest->m; ++rc)
-    {
-        //Here it's the r...
-        double val = dest->values[rc * dest->n];
-
-        //...and here it's the c.
-        determinant += val * a->values[rc];
-    }
-
-
-    matrix_multiply_value(dest, dest, 1 / determinant);
-
-
-    return true;
-}
-
-
-bool matrix_of_minors(matrix* dest, matrix* a)
+bool matrix_of_minors(matrix* dest, const matrix* a)
 {
     if (dest->m != a->m)
     {
@@ -492,7 +533,7 @@ bool matrix_of_minors(matrix* dest, matrix* a)
 }
 
 
-bool matrix_transpose(matrix* dest, matrix* a)
+bool matrix_transpose(matrix* dest, const matrix* a)
 {
     if (dest->m != a->n && dest->n != a->m)
     {
@@ -522,7 +563,7 @@ bool matrix_transpose(matrix* dest, matrix* a)
 
 
 //Other Operations:
-size_t matrix_to_str(char* output, size_t output_size, matrix* a)
+size_t matrix_to_str(char* output, size_t output_size, const matrix* a, short decimals)
 {
     int max_sizes[a->n];
 
@@ -537,7 +578,7 @@ size_t matrix_to_str(char* output, size_t output_size, matrix* a)
         {
             char temp_num[32];
 
-            double_nice_str_10dec(temp_num, 32, a->values[r * a->n + c]);
+            double_nice_str(temp_num, 32, a->values[r * a->n + c], decimals);
 
             short num_size = strlen(temp_num);
 
@@ -620,7 +661,7 @@ size_t matrix_to_str(char* output, size_t output_size, matrix* a)
         {
             char temp_num[32];
 
-            double_nice_str_10dec(temp_num, 32, a->values[r * a->n + c]);
+            double_nice_str(temp_num, 32, a->values[r * a->n + c], decimals);
 
             short num_size = strlen(temp_num);
             short half_size = (max_sizes[c] - num_size) / 2;
@@ -708,4 +749,10 @@ size_t matrix_to_str(char* output, size_t output_size, matrix* a)
     counter++;
 
     return counter;
+}
+
+
+size_t matrix_to_str_10dec(char* output, size_t output_size, const matrix* a)
+{
+    return matrix_to_str(output, output_size, a, 10);
 }

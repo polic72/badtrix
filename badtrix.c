@@ -80,7 +80,7 @@ int main()
 
     //char a_str[256];
 
-    //matrix_to_str(a_str, 256, &a);
+    //matrix_to_str_10dec(a_str, 256, &a);
 
 
     //printf("%s\n", a_str);
@@ -99,7 +99,7 @@ int main()
 
     //char b_str[256];
 
-    //matrix_to_str(b_str, 256, &b);
+    //matrix_to_str_10dec(b_str, 256, &b);
 
 
     //printf("%s\n", b_str);
@@ -114,7 +114,7 @@ int main()
 
     char det_mat_1_str[256];
 
-    matrix_to_str(det_mat_1_str, 256, &det_mat_1);
+    matrix_to_str_10dec(det_mat_1_str, 256, &det_mat_1);
     printf("%s\n", det_mat_1_str);
 
     double det_1;
@@ -134,7 +134,7 @@ int main()
 
     char det_mat_2_str[256];
 
-    matrix_to_str(det_mat_2_str, 256, &det_mat_2);
+    matrix_to_str_10dec(det_mat_2_str, 256, &det_mat_2);
     printf("%s\n", det_mat_2_str);
 
     double det_2;
@@ -154,7 +154,7 @@ int main()
 
     char det_mat_3_str[256];
 
-    matrix_to_str(det_mat_3_str, 256, &det_mat_3);
+    matrix_to_str_10dec(det_mat_3_str, 256, &det_mat_3);
     printf("%s\n", det_mat_3_str);
 
     double det_3;
@@ -174,7 +174,7 @@ int main()
 
     char min_mat_1_str[256];
 
-    matrix_to_str(min_mat_1_str, 256, &min_mat_1);
+    matrix_to_str_10dec(min_mat_1_str, 256, &min_mat_1);
     printf("%s\n", min_mat_1_str);
 
     printf("matrix of minors:\n");
@@ -190,7 +190,7 @@ int main()
 
     char min_mat_1_out_str[256];
 
-    matrix_to_str(min_mat_1_out_str, 256, &min_mat_1_out);
+    matrix_to_str_10dec(min_mat_1_out_str, 256, &min_mat_1_out);
     printf("%s\n", min_mat_1_out_str);
 
 
@@ -206,7 +206,7 @@ int main()
 
     char adj_mat_1_str[256];
 
-    matrix_to_str(adj_mat_1_str, 256, &adj_mat_1);
+    matrix_to_str_10dec(adj_mat_1_str, 256, &adj_mat_1);
     printf("%s\n", adj_mat_1_str);
 
     printf("adjoint matrix:\n");
@@ -222,7 +222,7 @@ int main()
 
     char adj_mat_1_out_str[256];
 
-    matrix_to_str(adj_mat_1_out_str, 256, &adj_mat_1_out);
+    matrix_to_str_10dec(adj_mat_1_out_str, 256, &adj_mat_1_out);
     printf("%s\n", adj_mat_1_out_str);
 
 
@@ -238,7 +238,7 @@ int main()
 
     char inv_mat_1_str[256];
 
-    matrix_to_str(inv_mat_1_str, 256, &inv_mat_1);
+    matrix_to_str_10dec(inv_mat_1_str, 256, &inv_mat_1);
     printf("%s\n", inv_mat_1_str);
 
     printf("inverse matrix:\n");
@@ -254,8 +254,43 @@ int main()
 
     char inv_mat_1_out_str[256];
 
-    matrix_to_str(inv_mat_1_out_str, 256, &inv_mat_1_out);
+    matrix_to_str_10dec(inv_mat_1_out_str, 256, &inv_mat_1_out);
     printf("%s\n", inv_mat_1_out_str);
+
+
+    printf("\n\n");
+
+
+    int givens_spot_r = 2;
+    int givens_spot_c = 0;
+
+    matrix given_mat_1;
+    given_mat_1.m = 3;
+    given_mat_1.n = 3;
+
+    double given_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    given_mat_1.values = given_mat_1_vals;
+
+    char given_mat_1_str[256];
+
+    matrix_to_str(given_mat_1_str, 256, &given_mat_1, 16);
+    printf("%s\n", given_mat_1_str);
+
+    printf("givens matrix for (%d, %d):\n", givens_spot_r, givens_spot_c);
+
+    matrix given_mat_1_out;
+    given_mat_1_out.m = 3;
+    given_mat_1_out.n = 3;
+
+    double given_mat_1_out_vals[given_mat_1_out.m * given_mat_1_out.n];
+    given_mat_1_out.values = given_mat_1_out_vals;
+
+    matrix_get_givens(&given_mat_1_out, &given_mat_1, givens_spot_r, givens_spot_c);
+
+    char given_mat_1_out_str[256];
+
+    matrix_to_str(given_mat_1_out_str, 256, &given_mat_1_out, 16);
+    printf("%s\n", given_mat_1_out_str);
 
 
     return 0;
