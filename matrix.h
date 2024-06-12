@@ -15,14 +15,14 @@ typedef struct matrix {
 
 //Mathematic Operations:
 bool matrix_add_value(matrix* dest, const matrix* a, double x);
-bool matrix_add_matrix(matrix* dest, const matrix* a, matrix* b);
+bool matrix_add_matrix(matrix* dest, const matrix* a, const matrix* b);
 
 bool matrix_subtract_value(matrix* dest, const matrix* a, double x);
-bool matrix_subtract_matrix(matrix* dest, const matrix* a, matrix* b);
+bool matrix_subtract_matrix(matrix* dest, const matrix* a, const matrix* b);
 
 bool matrix_multiply_value(matrix* dest, const matrix* a, double x);
-bool matrix_multiply_matrix(matrix* dest, const matrix* a, matrix* b);
-bool matrix_multiply_vector(vector* dest, const matrix* a, vector* v);
+bool matrix_multiply_matrix(matrix* dest, const matrix* a, const matrix* b);
+bool matrix_multiply_vector(vector* dest, const matrix* a, const vector* v);
 
 //Sub Operations:
 bool matrix_determinant(double* dest, const matrix* a);
@@ -38,8 +38,10 @@ bool matrix_inverse(matrix* dest, const matrix* a);
 bool matrix_of_cofactors(matrix* dest, const matrix* a);
 bool matrix_of_minors(matrix* dest, const matrix* a);
 bool matrix_transpose(matrix* dest, const matrix* a);
+size_t matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[]);
 
 //Other Operations:
+bool matrix_copy_to(matrix* dest, const matrix* a);
 size_t matrix_to_str(char* output, size_t output_size, const matrix* a, short decimals);
 size_t matrix_to_str_10dec(char* output, size_t output_size, const matrix* a);
 

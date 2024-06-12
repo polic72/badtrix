@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -29,7 +30,7 @@ bool matrix_add_value(matrix* dest, const matrix* a, double x)
 }
 
 
-bool matrix_add_matrix(matrix* dest, const matrix* a, matrix* b)
+bool matrix_add_matrix(matrix* dest, const matrix* a, const matrix* b)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -74,7 +75,7 @@ bool matrix_subtract_value(matrix* dest, const matrix* a, double x)
 }
 
 
-bool matrix_subtract_matrix(matrix* dest, const matrix* a, matrix* b)
+bool matrix_subtract_matrix(matrix* dest, const matrix* a, const matrix* b)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -118,7 +119,7 @@ bool matrix_multiply_value(matrix* dest, const matrix* a, double x)
 }
 
 
-bool matrix_multiply_matrix(matrix* dest, const matrix* a, matrix* b)
+bool matrix_multiply_matrix(matrix* dest, const matrix* a, const matrix* b)
 {
     if (dest->m != a->m && dest->n != b->n)
     {
@@ -148,7 +149,7 @@ bool matrix_multiply_matrix(matrix* dest, const matrix* a, matrix* b)
 }
 
 
-bool matrix_multiply_vector(vector* dest, const matrix* a, vector* v)
+bool matrix_multiply_vector(vector* dest, const matrix* a, const vector* v)
 {
     if (dest->n != a->m)
     {
@@ -562,7 +563,97 @@ bool matrix_transpose(matrix* dest, const matrix* a)
 }
 
 
+size_t matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
+{
+    if (dest->m != a->n && dest->n != a->m)
+    {
+        return 0;
+    }
+
+    if (a->m != a->n)
+    {
+        return 0;
+    }
+
+    if (a->m <= 1)
+    {
+        return 0;
+    }
+
+
+    if (!matrix_copy_to(dest, a))
+    {
+        return 0;
+    }
+
+
+    matrix temp_matrix;
+    temp_matrix.m = a->m;
+    temp_matrix.n = a->n;
+
+    double temp_mat_vals[temp_matrix.m * temp_matrix.n];
+    temp_matrix.values = temp_mat_vals;
+
+
+    size_t givens_counter = 0;
+
+    for (size_t r = 1; r < a->m; ++r)
+    {
+        for (size_t c = 0; c < r; ++c)
+        {
+            if (fabs(dest->values[r * dest->n + c]) < 0.000000000000001)
+            {
+                //Skip the identity givens.
+                continue;
+            }
+
+
+            if (!matrix_get_givens(&givens[givens_counter], dest, r, c))
+            {
+                return 0;
+            }
+
+
+            if (!matrix_copy_to(&temp_matrix, dest))
+            {
+                return 0;
+            }
+
+
+            if (!matrix_multiply_matrix(dest, &givens[givens_counter], &temp_matrix))
+            {
+                return 0;
+            }
+
+
+            givens_counter++;
+        }
+    }
+
+
+    return givens_counter;
+}
+
+
 //Other Operations:
+bool matrix_copy_to(matrix* dest, const matrix* a)
+{
+    if (dest->m != a->n && dest->n != a->m)
+    {
+        return false;
+    }
+
+
+    for (size_t i = 0; i < a->m * a->n; ++i)
+    {
+        dest->values[i] = a->values[i];
+    }
+
+
+    return true;
+}
+
+
 size_t matrix_to_str(char* output, size_t output_size, const matrix* a, short decimals)
 {
     int max_sizes[a->n];

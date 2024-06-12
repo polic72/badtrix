@@ -1,13 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 //#include <check.h>    //I'm eventually going to use automake and do all that junk, but I'm fine with just a main file for now.
 
 #include "extras.h"
 #include "matrix.h"
 #include "vector.h"
+
+
+double quick_random_double()
+{
+    uint64_t r53 = ((uint64_t)(rand()) << 21) ^ (rand() >> 2);
+
+    return (double)r53 / 9007199254740991.0; // 2^53 - 1
+}
 
 
 int main()
@@ -291,6 +301,87 @@ int main()
 
     matrix_to_str(given_mat_1_out_str, 256, &given_mat_1_out, 16);
     printf("%s\n", given_mat_1_out_str);
+
+
+    printf("\n\n");
+
+
+    ////srand(time(NULL));
+    //srand(1);
+
+    //matrix det_mat_big;
+    //det_mat_big.m = 16;
+    //det_mat_big.n = 16;
+
+    //double det_mat_big_vals[det_mat_big.m * det_mat_big.n];
+    //for (int r = 0; r < det_mat_big.m; ++r)
+    //{
+        //for (int c = 0; c < det_mat_big.n; ++c)
+        //{
+            //det_mat_big_vals[r * det_mat_big.n + c] = quick_random_double();
+        //}
+    //}
+
+    //det_mat_big.values = det_mat_big_vals;
+
+    //char det_mat_big_str[131072];
+
+    //matrix_to_str_10dec(det_mat_big_str, 131072, &det_mat_big);
+    //printf("%s\n", det_mat_big_str);
+
+    //double det_big;
+    //matrix_determinant(&det_big, &det_mat_big);
+    //printf("determinant = %f\n", det_big);
+
+
+    //printf("\n\n");
+
+
+    matrix upt_mat_1;
+    upt_mat_1.m = 3;
+    upt_mat_1.n = 3;
+
+    double upt_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    upt_mat_1.values = upt_mat_1_vals;
+
+    char upt_mat_1_str[256];
+
+    matrix_to_str_10dec(upt_mat_1_str, 256, &upt_mat_1);
+    printf("%s\n", upt_mat_1_str);
+
+    matrix upt_mat_1_out;
+    upt_mat_1_out.m = 3;
+    upt_mat_1_out.n = 3;
+
+    double upt_mat_1_out_vals[upt_mat_1_out.m * upt_mat_1_out.n];
+    upt_mat_1_out.values = upt_mat_1_out_vals;
+
+
+    size_t givens_max = upt_mat_1_out.n * (upt_mat_1_out.n + 1) / 2;
+    matrix upt_mat_givens[givens_max];
+
+    for (size_t i = 0; i < givens_max; ++i)
+    {
+        upt_mat_givens[i].m = upt_mat_1.m;
+        upt_mat_givens[i].n = upt_mat_1.n;
+
+        upt_mat_givens[i].values = malloc(upt_mat_givens[i].m * upt_mat_givens[i].n * sizeof(double));
+    }
+
+    size_t givens_count = matrix_triangle_upper(&upt_mat_1_out, &upt_mat_1, upt_mat_givens);
+    printf("givens count = %d\n", givens_count);
+
+    printf("upper-triangle converted matrix:\n");
+
+    char upt_mat_1_out_str[256];
+
+    matrix_to_str_10dec(upt_mat_1_out_str, 256, &upt_mat_1_out);
+    printf("%s\n", upt_mat_1_out_str);
+
+    for (size_t i = 0; i < givens_max; ++i)
+    {
+        free(upt_mat_givens[i].values);
+    }
 
 
     return 0;
