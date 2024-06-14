@@ -536,7 +536,7 @@ bool matrix_of_minors(matrix* dest, const matrix* a)
 
 bool matrix_transpose(matrix* dest, const matrix* a)
 {
-    if (dest->m != a->n && dest->n != a->m)
+    if (dest->m != a->m && dest->n != a->n)
     {
         return false;
     }
@@ -563,27 +563,27 @@ bool matrix_transpose(matrix* dest, const matrix* a)
 }
 
 
-size_t matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
+int matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
 {
-    if (dest->m != a->n && dest->n != a->m)
+    if (dest->m != a->m && dest->n != a->n)
     {
-        return 0;
+        return -1;
     }
 
     if (a->m != a->n)
     {
-        return 0;
+        return -1;
     }
 
     if (a->m <= 1)
     {
-        return 0;
+        return -1;
     }
 
 
     if (!matrix_copy_to(dest, a))
     {
-        return 0;
+        return -1;
     }
 
 
@@ -595,7 +595,7 @@ size_t matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
     temp_matrix.values = temp_mat_vals;
 
 
-    size_t givens_counter = 0;
+    int givens_counter = 0;
 
     for (size_t r = 1; r < a->m; ++r)
     {
@@ -610,19 +610,19 @@ size_t matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
 
             if (!matrix_get_givens(&givens[givens_counter], dest, r, c))
             {
-                return 0;
+                return -1;
             }
 
 
             if (!matrix_copy_to(&temp_matrix, dest))
             {
-                return 0;
+                return -1;
             }
 
 
             if (!matrix_multiply_matrix(dest, &givens[givens_counter], &temp_matrix))
             {
-                return 0;
+                return -1;
             }
 
 
@@ -632,6 +632,32 @@ size_t matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
 
 
     return givens_counter;
+}
+
+
+//Eigen Operations:
+bool matrix_decompose_eigens(eigen_decomp* dest, matrix* a, size_t max_iterations)
+{
+    if (dest->eigen_vectors->m != a->m && dest->eigen_vectors->n != a->n)
+    {
+        return false;
+    }
+
+    if (a->m != a->n)
+    {
+        return false;
+    }
+
+
+    double mew = 0;
+
+    for (size_t i = 0; i < max_iterations; ++i)
+    {
+        //QR algorithm baybeee!
+    }
+
+
+    return true;
 }
 
 
