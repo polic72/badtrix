@@ -13,6 +13,11 @@ typedef struct matrix {
 } matrix;
 
 
+//Creational Operations:
+bool matrix_create_identity(matrix* dest);
+bool matrix_create_zeros(matrix* dest);
+
+
 //Mathematic Operations:
 bool matrix_add_value(matrix* dest, const matrix* a, double x);
 bool matrix_add_matrix(matrix* dest, const matrix* a, const matrix* b);
@@ -28,7 +33,7 @@ bool matrix_multiply_vector(vector* dest, const matrix* a, const vector* v);
 //Sub Operations:
 bool matrix_determinant(double* dest, const matrix* a);
 bool matrix_get_cofactor(double* dest, const matrix* a, size_t row, size_t column);
-bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t column);
+bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t column); //Consider making a given procedure rather than using a full matrix.
 bool matrix_get_minor(double* dest, const matrix* a, size_t row, size_t column);
 bool matrix_get_submatrix(matrix* dest, const matrix* a, size_t row, size_t column);
 bool matrix_get_submatrix_range(matrix* dest, const matrix* a, size_t start_row, size_t start_column, size_t end_row, size_t end_column);
@@ -49,7 +54,7 @@ typedef struct eigen_decomp {
     matrix* eigen_vectors;
 } eigen_decomp;
 
-bool matrix_decompose_eigens(eigen_decomp* dest, matrix* a, size_t max_iterations);
+bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_iterations);
 
 
 //Other Operations:

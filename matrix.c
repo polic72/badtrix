@@ -9,6 +9,47 @@
 #include "matrix.h"
 
 
+//Creational Operations:
+bool matrix_create_identity(matrix* dest)
+{
+    if (dest->m != dest->n)
+    {
+        return false;
+    }
+
+
+    for (size_t r = 0; r < dest->m; ++r)
+    {
+        for (size_t c = 0; c < dest->n; ++c)
+        {
+            if (r == c)
+            {
+                dest->values[r * dest->n + c] = 1;
+            }
+            else
+            {
+                dest->values[r * dest->n + c] = 0;
+            }
+        }
+    }
+
+
+    return true;
+}
+
+
+bool matrix_create_zeros(matrix* dest)
+{
+    for (size_t rc = 0; rc < dest->m * dest->n; ++rc)
+    {
+        dest->values[rc] = 0;
+    }
+
+
+    return true;
+}
+
+
 //Mathematic Operations:
 bool matrix_add_value(matrix* dest, const matrix* a, double x)
 {
@@ -636,7 +677,7 @@ int matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
 
 
 //Eigen Operations:
-bool matrix_decompose_eigens(eigen_decomp* dest, matrix* a, size_t max_iterations)
+bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_iterations)
 {
     if (dest->eigen_vectors->m != a->m && dest->eigen_vectors->n != a->n)
     {
@@ -649,11 +690,102 @@ bool matrix_decompose_eigens(eigen_decomp* dest, matrix* a, size_t max_iteration
     }
 
 
+    size_t givens_max = a->n * (a->n + 1) / 2;    //This is just the number of elements below the diagonal.
+    matrix givens[givens_max];
+    for (size_t j = 0; j < givens_max; ++j)
+    {
+        givens[j].m = a->m;
+        givens[j].n = a->n;
+
+        givens[j].values = malloc(givens[j].m * givens[j].n * sizeof(double));
+    }
+
+
+    matrix_create_identity(dest->eigen_vectors);
+
+
+    matrix a_i;
+    a_i.m = a->m;
+    a_i.n = a->n;
+
+    double a_i_vals[a_i.m * a_i.n];
+    a_i.values = a_i_vals;
+
+    matrix_copy_to(&a_i, a);
+
+
     double mew = 0;
 
     for (size_t i = 0; i < max_iterations; ++i)
     {
-        //QR algorithm baybeee!
+        matrix temp_matrix;
+        temp_matrix.m = a_i.m;
+        temp_matrix.n = a_i.n;
+
+        double temp_vals[temp_matrix.m * temp_matrix.n];
+        temp_matrix.values = temp_vals;
+
+
+        matrix R;
+        R.m = a_i.m;
+        R.n = a_i.n;
+
+        double R_vals[R.m * R.n];
+        R.values = R_vals;
+
+
+        int num_givens = matrix_triangle_upper(&R, &a_i, givens);
+
+
+        matrix Q;
+        Q.m = a_i.m;
+        Q.n = a_i.n;
+
+        double Q_vals[Q.m * Q.n];
+        Q.values = Q_vals;
+
+        switch (num_givens)
+        {
+            case -1:
+                return false;
+
+
+            case 0:
+                matrix_create_identity(&Q);
+                break;
+
+
+            default:
+                matrix_copy_to(&Q, givens + num_givens - 1);
+
+                for (size_t j = num_givens - 2; j >= 0; ++j)
+                {
+                    matrix_multiply_matrix(&temp_matrix, &Q, givens + j);
+                    matrix_copy_to(&Q, &temp_matrix);
+                }
+
+                matrix_transpose(&Q, &Q);   //This operation can be done in-place.
+                break;
+        }
+
+
+        matrix_multiply_matrix(&a_i, &R, &Q);
+
+
+        matrix_multiply_matrix(&temp_matrix, dest->eigen_vectors, &Q);
+        matrix_copy_to(dest->eigen_vectors, &temp_matrix);
+    }
+
+
+    for (size_t i = 0; i < givens_max; ++i)
+    {
+        free(givens[i].values);
+    }
+
+
+    for (size_t rc = 0; rc < a_i.m; ++rc)
+    {
+        dest->eigen_values[rc] = a_i.values[rc];
     }
 
 
