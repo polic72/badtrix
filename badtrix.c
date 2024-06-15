@@ -384,5 +384,85 @@ int main()
     }
 
 
+    printf("\n\n");
+
+
+    size_t QR_mat_1_iterations = 1000;
+
+    matrix QR_mat_1;
+    QR_mat_1.m = 3;
+    QR_mat_1.n = 3;
+
+    double QR_mat_1_vals[] = { 1, -2, 3, -2, 5, 8, 3, 8, 9 };   //Symmetric first.
+    QR_mat_1.values = QR_mat_1_vals;
+
+
+    eigen_decomp QR_mat_1_eigens;
+
+    double QR_mat_1_eigen_vals[QR_mat_1.m];
+    QR_mat_1_eigens.eigen_values = QR_mat_1_eigen_vals;
+
+    matrix QR_mat_1_eigen_vectors;
+    QR_mat_1_eigen_vectors.m = QR_mat_1.m;
+    QR_mat_1_eigen_vectors.n = QR_mat_1.n;
+
+    double QR_mat_1_eigen_vectors_vals[QR_mat_1_eigen_vectors.m * QR_mat_1_eigen_vectors.n];
+    QR_mat_1_eigen_vectors.values = QR_mat_1_eigen_vectors_vals;
+
+    QR_mat_1_eigens.eigen_vectors = &QR_mat_1_eigen_vectors;
+
+
+    char QR_mat_1_str[256];
+
+    matrix_to_str(QR_mat_1_str, 256, &QR_mat_1, 16);
+    printf("%s\n", QR_mat_1_str);
+
+    matrix_decompose_eigens(&QR_mat_1_eigens, &QR_mat_1, QR_mat_1_iterations);
+
+    printf("eigen decomp for %d iterations:\n", QR_mat_1_iterations);
+
+    printf("eigen values = [");
+    for (size_t i = 0; i < QR_mat_1.m; ++i)
+    {
+        if (i != 0)
+        {
+            printf(", ");
+        }
+
+        char QR_mat_1_eigenvalue_out_str[256];
+
+        double_nice_str(QR_mat_1_eigenvalue_out_str, 256, QR_mat_1_eigens.eigen_values[i], 16);
+
+        printf("%s", QR_mat_1_eigenvalue_out_str);
+    }
+    printf("]\n");
+
+    printf("eigen vectors = \n");
+    matrix QR_mat_1_eigenvectors_copy;
+    QR_mat_1_eigenvectors_copy.m = QR_mat_1_eigens.eigen_vectors->m;
+    QR_mat_1_eigenvectors_copy.n = QR_mat_1_eigens.eigen_vectors->n;
+
+    double QR_mat_1_eigenvectors_copy_vals[QR_mat_1_eigenvectors_copy.m * QR_mat_1_eigenvectors_copy.n];
+    QR_mat_1_eigenvectors_copy.values = QR_mat_1_eigenvectors_copy_vals;
+
+    matrix_copy_to(&QR_mat_1_eigenvectors_copy, QR_mat_1_eigens.eigen_vectors);
+
+    for (size_t c = 0; c < QR_mat_1_eigenvectors_copy.n; ++c)
+    {
+        double denom = QR_mat_1_eigenvectors_copy.values[(QR_mat_1_eigenvectors_copy.m - 1) * QR_mat_1_eigenvectors_copy.n + c];
+
+        for (size_t r = 0; r < QR_mat_1_eigenvectors_copy.m; ++r)
+        {
+            QR_mat_1_eigenvectors_copy.values[r * QR_mat_1_eigenvectors_copy.n + c] /= denom;
+        }
+    }
+
+
+    char QR_mat_1_eigenvectors_out_str[256];
+
+    matrix_to_str(QR_mat_1_eigenvectors_out_str, 256, &QR_mat_1_eigenvectors_copy, 16);
+    printf("%s\n", QR_mat_1_eigenvectors_out_str);
+
+
     return 0;
 }

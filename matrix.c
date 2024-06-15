@@ -758,10 +758,15 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
             default:
                 matrix_copy_to(&Q, givens + num_givens - 1);
 
-                for (size_t j = num_givens - 2; j >= 0; ++j)
+                int breaker = -2;
+                for (long j = num_givens - 2; j >= 0; --j)
                 {
                     matrix_multiply_matrix(&temp_matrix, &Q, givens + j);
                     matrix_copy_to(&Q, &temp_matrix);
+                    if (j == breaker)
+                    {
+                        break;
+                    }
                 }
 
                 matrix_transpose(&Q, &Q);   //This operation can be done in-place.
@@ -785,7 +790,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
 
     for (size_t rc = 0; rc < a_i.m; ++rc)
     {
-        dest->eigen_values[rc] = a_i.values[rc];
+        dest->eigen_values[rc] = a_i.values[rc * a_i.n + rc];
     }
 
 
