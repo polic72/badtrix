@@ -38,6 +38,34 @@ bool matrix_create_identity(matrix* dest)
 }
 
 
+bool matrix_create_identity_scaled(matrix* dest, double scale)
+{
+    if (dest->m != dest->n)
+    {
+        return false;
+    }
+
+
+    for (size_t r = 0; r < dest->m; ++r)
+    {
+        for (size_t c = 0; c < dest->n; ++c)
+        {
+            if (r == c)
+            {
+                dest->values[r * dest->n + c] = scale;
+            }
+            else
+            {
+                dest->values[r * dest->n + c] = 0;
+            }
+        }
+    }
+
+
+    return true;
+}
+
+
 bool matrix_create_zeros(matrix* dest)
 {
     for (size_t rc = 0; rc < dest->m * dest->n; ++rc)
@@ -289,6 +317,49 @@ bool matrix_get_cofactor(double* dest, const matrix* a, size_t row, size_t colum
 }
 
 
+bool matrix_get_column_length(vector* dest, const matrix* a, size_t column, size_t start_row, size_t row_length)
+{
+    if (dest->n != row_length)
+    {
+        return false;
+    }
+
+
+    if (column < 0 || column >= a->n)
+    {
+        return false;
+    }
+
+
+    size_t end_row = start_row + row_length - 1;
+
+    if (start_row < 0 || start_row >= a->m)
+    {
+        return false;
+    }
+
+    if (end_row < 0 || end_row >= a->m)
+    {
+        return false;
+    }
+
+
+    for (size_t i = 0; i < row_length; ++i)
+    {
+        dest->values[i] = a->values[(i + start_row) * a->n + column];
+    }
+
+
+    return true;
+}
+
+
+bool matrix_get_column_whole(vector* dest, const matrix* a, size_t column)
+{
+    return matrix_get_column_length(dest, a, column, 0, a->m);
+}
+
+
 bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t column)
 {
     if (row < 0 || row >= a->m)
@@ -362,6 +433,49 @@ bool matrix_get_minor(double* dest, const matrix* a, size_t row, size_t column)
 }
 
 
+bool matrix_get_row_length(vector* dest, const matrix* a, size_t row, size_t start_column, size_t column_length)
+{
+    if (dest->n != column_length)
+    {
+        return false;
+    }
+
+
+    if (row < 0 || row >= a->n)
+    {
+        return false;
+    }
+
+
+    size_t end_column = start_column + column_length - 1;
+
+    if (start_column < 0 || start_column >= a->n)
+    {
+        return false;
+    }
+
+    if (end_column < 0 || end_column >= a->n)
+    {
+        return false;
+    }
+
+
+    for (size_t i = 0; i < column_length; ++i)
+    {
+        dest->values[i] = a->values[row * a->n + (i + start_column)];
+    }
+
+
+    return true;
+}
+
+
+bool matrix_get_row_whole(vector* dest, const matrix* a, size_t row)
+{
+    return matrix_get_row_length(dest, a, row, 0, a->n);
+}
+
+
 bool matrix_get_submatrix(matrix* dest, const matrix* a, size_t row, size_t column)
 {
     if (dest->m != a->m - 1)
@@ -412,60 +526,50 @@ bool matrix_get_submatrix(matrix* dest, const matrix* a, size_t row, size_t colu
 }
 
 
-bool matrix_get_submatrix_range(matrix* dest, const matrix* a, size_t start_row, size_t start_column, size_t end_row, size_t end_column)
+bool matrix_get_submatrix_lengths(matrix* dest, const matrix* a, 
+        size_t start_row, size_t row_length, size_t start_column, size_t column_length)
 {
-    size_t r_diff = end_row - start_row;
-    size_t c_diff = end_column - start_column;
-
-    if (r_diff < 0)
+    if (dest->m != row_length)
     {
         return false;
     }
 
-    if (c_diff < 0)
-    {
-        return false;
-    }
-
-
-    if (dest->m != r_diff)
-    {
-        return false;
-    }
-
-    if (dest->n != c_diff)
+    if (dest->n != column_length)
     {
         return false;
     }
 
 
-    if (start_row < 0)
+    size_t end_row = start_row + row_length - 1;
+    size_t end_column = start_column + column_length - 1;
+
+    if (start_row < 0 || start_row >= a->m)
     {
         return false;
     }
 
-    if (end_row >= a->m)
-    {
-        return false;
-    }
-    
-
-    if (start_column < 0)
-    {
-        return false;
-    }
-
-    if (end_column >= a->n)
+    if (end_row < 0 || end_row >= a->m)
     {
         return false;
     }
 
 
-    for (size_t r = start_row; r < end_row; ++r)
+    if (start_column < 0 || start_column >= a->n)
     {
-        for (size_t c = start_column; c < end_column; ++c)
+        return false;
+    }
+
+    if (end_column < 0 || end_column >= a->n)
+    {
+        return false;
+    }
+
+
+    for (size_t r = 0; r < row_length; ++r)
+    {
+        for (size_t c = 0; c < column_length; ++c)
         {
-            dest->values[(r - start_row) * c_diff + (c - start_column)] = a->values[r * a->n + c];
+            dest->values[r * dest->n + c] = a->values[(r + start_row) * a->n + (c + start_column)];
         }
     }
 
@@ -690,6 +794,15 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
     }
 
 
+    //This will be used as a buffer for mathematical operations.
+    matrix temp_matrix;
+    temp_matrix.m = a->m;
+    temp_matrix.n = a->n;
+
+    double temp_vals[temp_matrix.m * temp_matrix.n];
+    temp_matrix.values = temp_vals;
+
+
     size_t givens_max = a->n * (a->n + 1) / 2;    //This is just the number of elements below the diagonal.
     matrix givens[givens_max];
     for (size_t j = 0; j < givens_max; ++j)
@@ -718,14 +831,6 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
 
     for (size_t i = 0; i < max_iterations; ++i)
     {
-        matrix temp_matrix;
-        temp_matrix.m = a_i.m;
-        temp_matrix.n = a_i.n;
-
-        double temp_vals[temp_matrix.m * temp_matrix.n];
-        temp_matrix.values = temp_vals;
-
-
         matrix R;
         R.m = a_i.m;
         R.n = a_i.n;
@@ -758,15 +863,10 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
             default:
                 matrix_copy_to(&Q, givens + num_givens - 1);
 
-                int breaker = -2;
                 for (long j = num_givens - 2; j >= 0; --j)
                 {
                     matrix_multiply_matrix(&temp_matrix, &Q, givens + j);
                     matrix_copy_to(&Q, &temp_matrix);
-                    if (j == breaker)
-                    {
-                        break;
-                    }
                 }
 
                 matrix_transpose(&Q, &Q);   //This operation can be done in-place.
@@ -792,6 +892,85 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
     {
         dest->eigen_values[rc] = a_i.values[rc * a_i.n + rc];
     }
+
+
+    matrix schur_converter;
+    schur_converter.m = a_i.m;
+    schur_converter.n = a_i.n;
+
+    double schur_converter_vals[schur_converter.m * schur_converter.n];
+    schur_converter.values = schur_converter_vals;
+
+    matrix_create_identity(&schur_converter);
+
+
+    for (size_t c = 1; c < schur_converter.n; ++c)
+    {
+        matrix inner_temp_matrix;
+        inner_temp_matrix.m = c;
+        inner_temp_matrix.n = c;
+
+        double inner_temp_matrix_vals[inner_temp_matrix.m * inner_temp_matrix.n];
+        inner_temp_matrix.values = inner_temp_matrix_vals;
+
+
+        matrix upper_biased_factor;
+        upper_biased_factor.m = c;
+        upper_biased_factor.n = c;
+
+        double upper_biased_factor_vals[upper_biased_factor.m * upper_biased_factor.n];
+        upper_biased_factor.values = upper_biased_factor_vals;
+
+
+        matrix_create_identity_scaled(&upper_biased_factor, a_i.values[c * a_i.n + c]);
+
+
+        matrix sub_temp_matrix;
+        sub_temp_matrix.m = c;
+        sub_temp_matrix.n = c;
+
+        double sub_temp_matrix_vals[sub_temp_matrix.m * sub_temp_matrix.n];
+        sub_temp_matrix.values = sub_temp_matrix_vals;
+
+
+        matrix_get_submatrix_lengths(&sub_temp_matrix, &a_i, 0, c, 0, c);
+
+
+        matrix_subtract_matrix(&inner_temp_matrix, &upper_biased_factor, &sub_temp_matrix);
+        matrix_copy_to(&upper_biased_factor, &inner_temp_matrix);
+
+        matrix_inverse(&inner_temp_matrix, &upper_biased_factor);
+        matrix_copy_to(&upper_biased_factor, &inner_temp_matrix);
+
+
+        vector temp_vector;
+        temp_vector.n = c;
+
+        double temp_vector_vals[temp_vector.n];
+        temp_vector.values = temp_vector_vals;
+
+
+        vector column_vector;
+        column_vector.n = c;
+
+        double column_vector_vals[column_vector.n];
+        column_vector.values = column_vector_vals;
+
+        matrix_get_column_length(&column_vector, &a_i, c, 0, c);
+
+
+        bool passed = matrix_multiply_vector(&temp_vector, &upper_biased_factor, &column_vector);
+
+
+        for (size_t r = 0; r < c; ++r)
+        {
+            schur_converter.values[r * schur_converter.n + c] = temp_vector.values[r];
+        }
+    }
+
+
+    matrix_multiply_matrix(&temp_matrix, dest->eigen_vectors, &schur_converter);
+    matrix_copy_to(dest->eigen_vectors, &temp_matrix);
 
 
     return true;

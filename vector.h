@@ -26,6 +26,7 @@ bool vector_cross(vector *dest, ...);
 vector *vector_skewSymetric(vector *a);
 
 //Other Operations:
-size_t vector_to_str(char* output, size_t output_size, vector* v);
+size_t vector_to_str(char* output, size_t output_size, const vector* v, short decimals);
+size_t vector_to_str_10dec(char* output, size_t output_size, const vector* v);
 
 #endif //VECTOR_H

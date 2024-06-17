@@ -15,6 +15,7 @@ typedef struct matrix {
 
 //Creational Operations:
 bool matrix_create_identity(matrix* dest);
+bool matrix_create_identity_scaled(matrix* dest, double scale);
 bool matrix_create_zeros(matrix* dest);
 
 
@@ -33,10 +34,14 @@ bool matrix_multiply_vector(vector* dest, const matrix* a, const vector* v);
 //Sub Operations:
 bool matrix_determinant(double* dest, const matrix* a);
 bool matrix_get_cofactor(double* dest, const matrix* a, size_t row, size_t column);
+bool matrix_get_column_length(vector* dest, const matrix* a, size_t column, size_t start_row, size_t row_length);
+bool matrix_get_column_whole(vector* dest, const matrix* a, size_t column);
 bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t column); //Consider making a given procedure rather than using a full matrix.
 bool matrix_get_minor(double* dest, const matrix* a, size_t row, size_t column);
+bool matrix_get_row_length(vector* dest, const matrix* a, size_t row, size_t start_column, size_t column_length);
+bool matrix_get_row_whole(vector* dest, const matrix* a, size_t row);
 bool matrix_get_submatrix(matrix* dest, const matrix* a, size_t row, size_t column);
-bool matrix_get_submatrix_range(matrix* dest, const matrix* a, size_t start_row, size_t start_column, size_t end_row, size_t end_column);
+bool matrix_get_submatrix_lengths(matrix* dest, const matrix* a, size_t start_row, size_t start_column, size_t end_row, size_t end_column);
 
 
 //Transform Operations:

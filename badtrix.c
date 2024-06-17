@@ -387,6 +387,42 @@ int main()
     printf("\n\n");
 
 
+    int col_mat_1_column = 0;
+
+    int col_mat_1_row_start = 1;
+    int col_mat_1_row_length = 2;
+
+    matrix col_mat_1;
+    col_mat_1.m = 3;
+    col_mat_1.n = 3;
+
+    double col_mat_1_vals[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    col_mat_1.values = col_mat_1_vals;
+
+    char col_mat_1_str[256];
+
+    matrix_to_str(col_mat_1_str, 256, &col_mat_1, 16);
+    printf("%s\n", col_mat_1_str);
+
+    printf("column %d vector for row [%d, %d]:\n", col_mat_1_column, col_mat_1_row_start, col_mat_1_row_length - 1 + col_mat_1_row_start);
+
+    vector col_vec_1_out;
+    col_vec_1_out.n = col_mat_1_row_length;
+
+    double col_vec_1_out_vals[col_vec_1_out.n];
+    col_vec_1_out.values = col_vec_1_out_vals;
+
+    matrix_get_column_length(&col_vec_1_out, &col_mat_1, col_mat_1_column, col_mat_1_row_start, col_mat_1_row_length);
+
+    char col_vec_1_out_str[256];
+
+    vector_to_str(col_vec_1_out_str, 256, &col_vec_1_out, 16);
+    printf("%s\n", col_vec_1_out_str);
+
+
+    printf("\n\n");
+
+
     size_t QR_mat_1_iterations = 1000;
 
     matrix QR_mat_1;
@@ -462,6 +498,86 @@ int main()
 
     matrix_to_str(QR_mat_1_eigenvectors_out_str, 256, &QR_mat_1_eigenvectors_copy, 16);
     printf("%s\n", QR_mat_1_eigenvectors_out_str);
+
+
+    printf("\n\n");
+
+
+    size_t QR_mat_2_iterations = 10000;
+
+    matrix QR_mat_2;
+    QR_mat_2.m = 3;
+    QR_mat_2.n = 3;
+
+    double QR_mat_2_vals[] = { 1, 5, 3, 4, 5, 5, 7, 8, 9 }; //Simply asymmetric second.
+    QR_mat_2.values = QR_mat_2_vals;
+
+
+    eigen_decomp QR_mat_2_eigens;
+
+    double QR_mat_2_eigen_vals[QR_mat_2.m];
+    QR_mat_2_eigens.eigen_values = QR_mat_2_eigen_vals;
+
+    matrix QR_mat_2_eigen_vectors;
+    QR_mat_2_eigen_vectors.m = QR_mat_2.m;
+    QR_mat_2_eigen_vectors.n = QR_mat_2.n;
+
+    double QR_mat_2_eigen_vectors_vals[QR_mat_2_eigen_vectors.m * QR_mat_2_eigen_vectors.n];
+    QR_mat_2_eigen_vectors.values = QR_mat_2_eigen_vectors_vals;
+
+    QR_mat_2_eigens.eigen_vectors = &QR_mat_2_eigen_vectors;
+
+
+    char QR_mat_2_str[256];
+
+    matrix_to_str(QR_mat_2_str, 256, &QR_mat_2, 16);
+    printf("%s\n", QR_mat_2_str);
+
+    matrix_decompose_eigens(&QR_mat_2_eigens, &QR_mat_2, QR_mat_2_iterations);
+
+    printf("eigen decomp for %d iterations:\n", QR_mat_2_iterations);
+
+    printf("eigen values = [");
+    for (size_t i = 0; i < QR_mat_2.m; ++i)
+    {
+        if (i != 0)
+        {
+            printf(", ");
+        }
+
+        char QR_mat_2_eigenvalue_out_str[256];
+
+        double_nice_str(QR_mat_2_eigenvalue_out_str, 256, QR_mat_2_eigens.eigen_values[i], 16);
+
+        printf("%s", QR_mat_2_eigenvalue_out_str);
+    }
+    printf("]\n");
+
+    printf("eigen vectors = \n");
+    matrix QR_mat_2_eigenvectors_copy;
+    QR_mat_2_eigenvectors_copy.m = QR_mat_2_eigens.eigen_vectors->m;
+    QR_mat_2_eigenvectors_copy.n = QR_mat_2_eigens.eigen_vectors->n;
+
+    double QR_mat_2_eigenvectors_copy_vals[QR_mat_2_eigenvectors_copy.m * QR_mat_2_eigenvectors_copy.n];
+    QR_mat_2_eigenvectors_copy.values = QR_mat_2_eigenvectors_copy_vals;
+
+    matrix_copy_to(&QR_mat_2_eigenvectors_copy, QR_mat_2_eigens.eigen_vectors);
+
+    for (size_t c = 0; c < QR_mat_2_eigenvectors_copy.n; ++c)
+    {
+        double denom = QR_mat_2_eigenvectors_copy.values[(QR_mat_2_eigenvectors_copy.m - 1) * QR_mat_2_eigenvectors_copy.n + c];
+
+        for (size_t r = 0; r < QR_mat_2_eigenvectors_copy.m; ++r)
+        {
+            QR_mat_2_eigenvectors_copy.values[r * QR_mat_2_eigenvectors_copy.n + c] /= denom;
+        }
+    }
+
+
+    char QR_mat_2_eigenvectors_out_str[256];
+
+    matrix_to_str(QR_mat_2_eigenvectors_out_str, 256, &QR_mat_2_eigenvectors_copy, 16);
+    printf("%s\n", QR_mat_2_eigenvectors_out_str);
 
 
     return 0;

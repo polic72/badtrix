@@ -138,7 +138,7 @@ bool vector_cross(vector *dest, ...)
 }
 
 
-size_t vector_to_str(char* output, size_t output_size, vector* v)
+size_t vector_to_str(char* output, size_t output_size, vector* v, short decimals)
 {
     int max_size = -1;
 
@@ -146,7 +146,7 @@ size_t vector_to_str(char* output, size_t output_size, vector* v)
     {
         char temp_num[32];
 
-        double_nice_str_10dec(temp_num, 32, v->values[i]);
+        double_nice_str(temp_num, 32, v->values[i], decimals);
 
         short num_size = strlen(temp_num);
 
@@ -313,4 +313,10 @@ size_t vector_to_str(char* output, size_t output_size, vector* v)
     counter++;
 
     return counter;
+}
+
+
+size_t vector_to_str_10dec(char* output, size_t output_size, const vector* v)
+{
+    return vector_to_str(output, output_size, v, 10);
 }
