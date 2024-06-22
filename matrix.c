@@ -827,10 +827,30 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
     matrix_copy_to(&a_i, a);
 
 
-    double mew = 0;
+    matrix a_super;
+    a_super.m = a->m;
+    a_super.n = a->n;
+
+    double a_super_vals[a_super.m * a_super.n];
+    a_super.values = a_super_vals;
+
+    matrix_copy_to(&a_super, a);
+
+
+    double mu = 0;
 
     for (size_t i = 0; i < max_iterations; ++i)
     {
+        //matrix temp_matrix_aI;
+        //temp_matrix_aI.m = a_i.m;
+        //temp_matrix_aI.n = a_i.n;
+
+        //double temp_matrix_aI_vals[temp_matrix_aI.m * temp_matrix_aI.n];
+        //temp_matrix_aI.values = temp_matrix_aI_vals;
+
+        //You can reset the size of the temp matrix to make things work. Get that mu goin.
+        //Use https://web.stanford.edu/class/cme335/lecture5 for the Wilkinson shift.
+
         matrix R;
         R.m = a_i.m;
         R.n = a_i.n;
