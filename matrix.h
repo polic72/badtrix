@@ -1,7 +1,9 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include <stdio.h>
 #include <stdbool.h>
+#include <complex.h>
 
 #include "vector.h"
 
@@ -9,35 +11,35 @@
 typedef struct matrix {
     size_t m;
     size_t n;
-    double* values; //Consider possibly making this a variable-sized struct
+    double complex* values; //Consider possibly making this a variable-sized struct
 } matrix;
 
 
 //Creational Operations:
 bool matrix_create_identity(matrix* dest);
-bool matrix_create_identity_scaled(matrix* dest, double scale);
+bool matrix_create_identity_scaled(matrix* dest, double complex scale);
 bool matrix_create_zeros(matrix* dest);
 
 
 //Mathematic Operations:
-bool matrix_add_value(matrix* dest, const matrix* a, double x);
+bool matrix_add_value(matrix* dest, const matrix* a, double complex x);
 bool matrix_add_matrix(matrix* dest, const matrix* a, const matrix* b);
 
-bool matrix_subtract_value(matrix* dest, const matrix* a, double x);
+bool matrix_subtract_value(matrix* dest, const matrix* a, double complex x);
 bool matrix_subtract_matrix(matrix* dest, const matrix* a, const matrix* b);
 
-bool matrix_multiply_value(matrix* dest, const matrix* a, double x);
+bool matrix_multiply_value(matrix* dest, const matrix* a, double complex x);
 bool matrix_multiply_matrix(matrix* dest, const matrix* a, const matrix* b);
 bool matrix_multiply_vector(vector* dest, const matrix* a, const vector* v);
 
 
 //Sub Operations:
-bool matrix_determinant(double* dest, const matrix* a);
-bool matrix_get_cofactor(double* dest, const matrix* a, size_t row, size_t column);
+bool matrix_determinant(double complex* dest, const matrix* a);
+bool matrix_get_cofactor(double complex* dest, const matrix* a, size_t row, size_t column);
 bool matrix_get_column_length(vector* dest, const matrix* a, size_t column, size_t start_row, size_t row_length);
 bool matrix_get_column_whole(vector* dest, const matrix* a, size_t column);
 bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t column); //Consider making a given procedure rather than using a full matrix.
-bool matrix_get_minor(double* dest, const matrix* a, size_t row, size_t column);
+bool matrix_get_minor(double complex* dest, const matrix* a, size_t row, size_t column);
 bool matrix_get_row_length(vector* dest, const matrix* a, size_t row, size_t start_column, size_t column_length);
 bool matrix_get_row_whole(vector* dest, const matrix* a, size_t row);
 bool matrix_get_submatrix(matrix* dest, const matrix* a, size_t row, size_t column);
@@ -55,7 +57,7 @@ int matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[]);
 
 //Eigen Operations:
 typedef struct eigen_decomp {
-    double* eigen_values;
+    double complex* eigen_values;
     matrix* eigen_vectors;
 } eigen_decomp;
 

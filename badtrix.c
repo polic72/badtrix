@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <complex.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>
@@ -119,7 +120,7 @@ int main()
     det_mat_1.m = 2;
     det_mat_1.n = 2;
 
-    double det_mat_1_vals[] = { 1, 4, 2, 3 };
+    double complex det_mat_1_vals[] = { 1, 4, 2, 3 };
     det_mat_1.values = det_mat_1_vals;
 
     char det_mat_1_str[256];
@@ -127,7 +128,7 @@ int main()
     matrix_to_str_10dec(det_mat_1_str, 256, &det_mat_1);
     printf("%s\n", det_mat_1_str);
 
-    double det_1;
+    double complex det_1;
     matrix_determinant(&det_1, &det_mat_1);
     printf("determinant = %f\n", det_1);
 
@@ -135,11 +136,34 @@ int main()
     printf("\n\n");
 
 
+    matrix det_mat_i;
+    det_mat_i.m = 2;
+    det_mat_i.n = 2;
+
+    double complex det_mat_i_vals[] = { 1, 4, 2, I };
+    det_mat_i.values = det_mat_i_vals;
+
+    char det_mat_i_str[256];
+
+    matrix_to_str_10dec(det_mat_i_str, 256, &det_mat_i);
+    printf("%s\n", det_mat_i_str);
+
+    double complex det_i;
+    matrix_determinant(&det_i, &det_mat_i);
+    char det_i_str[100];
+    complex_nice_str_10dec(det_i_str, 100, det_i);
+    printf("determinant = %s\n", det_i_str);
+
+
+    printf("\n\n");
+
+
+
     matrix det_mat_2;
     det_mat_2.m = 3;
     det_mat_2.n = 3;
 
-    double det_mat_2_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    double complex det_mat_2_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
     det_mat_2.values = det_mat_2_vals;
 
     char det_mat_2_str[256];
@@ -147,7 +171,7 @@ int main()
     matrix_to_str_10dec(det_mat_2_str, 256, &det_mat_2);
     printf("%s\n", det_mat_2_str);
 
-    double det_2;
+    double complex det_2;
     matrix_determinant(&det_2, &det_mat_2);
     printf("determinant = %f\n", det_2);
 
@@ -159,7 +183,7 @@ int main()
     det_mat_3.m = 4;
     det_mat_3.n = 4;
 
-    double det_mat_3_vals[] = { 1, 2, 3, 1, 4, 5, 6, -1, 7, 8, 9, 5, 6, 4, 8, 0 };
+    double complex det_mat_3_vals[] = { 1, 2, 3, 1, 4, 5, 6, -1, 7, 8, 9, 5, 6, 4, 8, 0 };
     det_mat_3.values = det_mat_3_vals;
 
     char det_mat_3_str[256];
@@ -167,7 +191,7 @@ int main()
     matrix_to_str_10dec(det_mat_3_str, 256, &det_mat_3);
     printf("%s\n", det_mat_3_str);
 
-    double det_3;
+    double complex det_3;
     matrix_determinant(&det_3, &det_mat_3);
     printf("determinant = %f\n", det_3);
 
@@ -179,7 +203,7 @@ int main()
     min_mat_1.m = 3;
     min_mat_1.n = 3;
 
-    double min_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    double complex min_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
     min_mat_1.values = min_mat_1_vals;
 
     char min_mat_1_str[256];
@@ -193,7 +217,7 @@ int main()
     min_mat_1_out.m = 3;
     min_mat_1_out.n = 3;
 
-    double min_mat_1_out_vals[min_mat_1_out.m * min_mat_1_out.n];
+    double complex min_mat_1_out_vals[min_mat_1_out.m * min_mat_1_out.n];
     min_mat_1_out.values = min_mat_1_out_vals;
 
     matrix_of_minors(&min_mat_1_out, &min_mat_1);
@@ -211,7 +235,7 @@ int main()
     adj_mat_1.m = 3;
     adj_mat_1.n = 3;
 
-    double adj_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    double complex adj_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
     adj_mat_1.values = adj_mat_1_vals;
 
     char adj_mat_1_str[256];
@@ -225,7 +249,7 @@ int main()
     adj_mat_1_out.m = 3;
     adj_mat_1_out.n = 3;
 
-    double adj_mat_1_out_vals[adj_mat_1_out.m * adj_mat_1_out.n];
+    double complex adj_mat_1_out_vals[adj_mat_1_out.m * adj_mat_1_out.n];
     adj_mat_1_out.values = adj_mat_1_out_vals;
 
     matrix_adjoint(&adj_mat_1_out, &adj_mat_1);
@@ -243,7 +267,7 @@ int main()
     inv_mat_1.m = 3;
     inv_mat_1.n = 3;
 
-    double inv_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    double complex inv_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
     inv_mat_1.values = inv_mat_1_vals;
 
     char inv_mat_1_str[256];
@@ -257,7 +281,7 @@ int main()
     inv_mat_1_out.m = 3;
     inv_mat_1_out.n = 3;
 
-    double inv_mat_1_out_vals[inv_mat_1_out.m * inv_mat_1_out.n];
+    double complex inv_mat_1_out_vals[inv_mat_1_out.m * inv_mat_1_out.n];
     inv_mat_1_out.values = inv_mat_1_out_vals;
 
     matrix_inverse(&inv_mat_1_out, &inv_mat_1);
@@ -278,7 +302,7 @@ int main()
     given_mat_1.m = 3;
     given_mat_1.n = 3;
 
-    double given_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    double complex given_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
     given_mat_1.values = given_mat_1_vals;
 
     char given_mat_1_str[256];
@@ -292,7 +316,7 @@ int main()
     given_mat_1_out.m = 3;
     given_mat_1_out.n = 3;
 
-    double given_mat_1_out_vals[given_mat_1_out.m * given_mat_1_out.n];
+    double complex given_mat_1_out_vals[given_mat_1_out.m * given_mat_1_out.n];
     given_mat_1_out.values = given_mat_1_out_vals;
 
     matrix_get_givens(&given_mat_1_out, &given_mat_1, givens_spot_r, givens_spot_c);
@@ -313,7 +337,7 @@ int main()
     //det_mat_big.m = 16;
     //det_mat_big.n = 16;
 
-    //double det_mat_big_vals[det_mat_big.m * det_mat_big.n];
+    //double complex det_mat_big_vals[det_mat_big.m * det_mat_big.n];
     //for (int r = 0; r < det_mat_big.m; ++r)
     //{
         //for (int c = 0; c < det_mat_big.n; ++c)
@@ -329,7 +353,7 @@ int main()
     //matrix_to_str_10dec(det_mat_big_str, 131072, &det_mat_big);
     //printf("%s\n", det_mat_big_str);
 
-    //double det_big;
+    //double complex det_big;
     //matrix_determinant(&det_big, &det_mat_big);
     //printf("determinant = %f\n", det_big);
 
@@ -341,7 +365,7 @@ int main()
     upt_mat_1.m = 3;
     upt_mat_1.n = 3;
 
-    double upt_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
+    double complex upt_mat_1_vals[] = { 1, 5, 3, 4, 5, 6, 7, 8, 9 };
     upt_mat_1.values = upt_mat_1_vals;
 
     char upt_mat_1_str[256];
@@ -353,7 +377,7 @@ int main()
     upt_mat_1_out.m = 3;
     upt_mat_1_out.n = 3;
 
-    double upt_mat_1_out_vals[upt_mat_1_out.m * upt_mat_1_out.n];
+    double complex upt_mat_1_out_vals[upt_mat_1_out.m * upt_mat_1_out.n];
     upt_mat_1_out.values = upt_mat_1_out_vals;
 
 
@@ -365,7 +389,7 @@ int main()
         upt_mat_givens[i].m = upt_mat_1.m;
         upt_mat_givens[i].n = upt_mat_1.n;
 
-        upt_mat_givens[i].values = malloc(upt_mat_givens[i].m * upt_mat_givens[i].n * sizeof(double));
+        upt_mat_givens[i].values = malloc(upt_mat_givens[i].m * upt_mat_givens[i].n * sizeof(double complex));
     }
 
     size_t givens_count = matrix_triangle_upper(&upt_mat_1_out, &upt_mat_1, upt_mat_givens);
@@ -396,7 +420,7 @@ int main()
     col_mat_1.m = 3;
     col_mat_1.n = 3;
 
-    double col_mat_1_vals[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    double complex col_mat_1_vals[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     col_mat_1.values = col_mat_1_vals;
 
     char col_mat_1_str[256];
@@ -409,7 +433,7 @@ int main()
     vector col_vec_1_out;
     col_vec_1_out.n = col_mat_1_row_length;
 
-    double col_vec_1_out_vals[col_vec_1_out.n];
+    double complex col_vec_1_out_vals[col_vec_1_out.n];
     col_vec_1_out.values = col_vec_1_out_vals;
 
     matrix_get_column_length(&col_vec_1_out, &col_mat_1, col_mat_1_column, col_mat_1_row_start, col_mat_1_row_length);
@@ -429,20 +453,20 @@ int main()
     QR_mat_1.m = 3;
     QR_mat_1.n = 3;
 
-    double QR_mat_1_vals[] = { 1, -2, 3, -2, 5, 8, 3, 8, 9 };   //Symmetric first.
+    double complex QR_mat_1_vals[] = { 1, -2, 3, -2, 5, 8, 3, 8, 9 };   //Symmetric first.
     QR_mat_1.values = QR_mat_1_vals;
 
 
     eigen_decomp QR_mat_1_eigens;
 
-    double QR_mat_1_eigen_vals[QR_mat_1.m];
+    double complex QR_mat_1_eigen_vals[QR_mat_1.m];
     QR_mat_1_eigens.eigen_values = QR_mat_1_eigen_vals;
 
     matrix QR_mat_1_eigen_vectors;
     QR_mat_1_eigen_vectors.m = QR_mat_1.m;
     QR_mat_1_eigen_vectors.n = QR_mat_1.n;
 
-    double QR_mat_1_eigen_vectors_vals[QR_mat_1_eigen_vectors.m * QR_mat_1_eigen_vectors.n];
+    double complex QR_mat_1_eigen_vectors_vals[QR_mat_1_eigen_vectors.m * QR_mat_1_eigen_vectors.n];
     QR_mat_1_eigen_vectors.values = QR_mat_1_eigen_vectors_vals;
 
     QR_mat_1_eigens.eigen_vectors = &QR_mat_1_eigen_vectors;
@@ -478,14 +502,14 @@ int main()
     QR_mat_1_eigenvectors_copy.m = QR_mat_1_eigens.eigen_vectors->m;
     QR_mat_1_eigenvectors_copy.n = QR_mat_1_eigens.eigen_vectors->n;
 
-    double QR_mat_1_eigenvectors_copy_vals[QR_mat_1_eigenvectors_copy.m * QR_mat_1_eigenvectors_copy.n];
+    double complex QR_mat_1_eigenvectors_copy_vals[QR_mat_1_eigenvectors_copy.m * QR_mat_1_eigenvectors_copy.n];
     QR_mat_1_eigenvectors_copy.values = QR_mat_1_eigenvectors_copy_vals;
 
     matrix_copy_to(&QR_mat_1_eigenvectors_copy, QR_mat_1_eigens.eigen_vectors);
 
     for (size_t c = 0; c < QR_mat_1_eigenvectors_copy.n; ++c)
     {
-        double denom = QR_mat_1_eigenvectors_copy.values[(QR_mat_1_eigenvectors_copy.m - 1) * QR_mat_1_eigenvectors_copy.n + c];
+        double complex denom = QR_mat_1_eigenvectors_copy.values[(QR_mat_1_eigenvectors_copy.m - 1) * QR_mat_1_eigenvectors_copy.n + c];
 
         for (size_t r = 0; r < QR_mat_1_eigenvectors_copy.m; ++r)
         {
@@ -509,20 +533,20 @@ int main()
     QR_mat_2.m = 3;
     QR_mat_2.n = 3;
 
-    double QR_mat_2_vals[] = { 1, 5, 3, 4, 5, 5, 7, 8, 9 }; //Simply asymmetric second.
+    double complex QR_mat_2_vals[] = { 1, 5, 3, 4, 5, 5, 7, 8, 9 }; //Simply asymmetric second.
     QR_mat_2.values = QR_mat_2_vals;
 
 
     eigen_decomp QR_mat_2_eigens;
 
-    double QR_mat_2_eigen_vals[QR_mat_2.m];
+    double complex QR_mat_2_eigen_vals[QR_mat_2.m];
     QR_mat_2_eigens.eigen_values = QR_mat_2_eigen_vals;
 
     matrix QR_mat_2_eigen_vectors;
     QR_mat_2_eigen_vectors.m = QR_mat_2.m;
     QR_mat_2_eigen_vectors.n = QR_mat_2.n;
 
-    double QR_mat_2_eigen_vectors_vals[QR_mat_2_eigen_vectors.m * QR_mat_2_eigen_vectors.n];
+    double complex QR_mat_2_eigen_vectors_vals[QR_mat_2_eigen_vectors.m * QR_mat_2_eigen_vectors.n];
     QR_mat_2_eigen_vectors.values = QR_mat_2_eigen_vectors_vals;
 
     QR_mat_2_eigens.eigen_vectors = &QR_mat_2_eigen_vectors;
@@ -558,14 +582,14 @@ int main()
     QR_mat_2_eigenvectors_copy.m = QR_mat_2_eigens.eigen_vectors->m;
     QR_mat_2_eigenvectors_copy.n = QR_mat_2_eigens.eigen_vectors->n;
 
-    double QR_mat_2_eigenvectors_copy_vals[QR_mat_2_eigenvectors_copy.m * QR_mat_2_eigenvectors_copy.n];
+    double complex QR_mat_2_eigenvectors_copy_vals[QR_mat_2_eigenvectors_copy.m * QR_mat_2_eigenvectors_copy.n];
     QR_mat_2_eigenvectors_copy.values = QR_mat_2_eigenvectors_copy_vals;
 
     matrix_copy_to(&QR_mat_2_eigenvectors_copy, QR_mat_2_eigens.eigen_vectors);
 
     for (size_t c = 0; c < QR_mat_2_eigenvectors_copy.n; ++c)
     {
-        double denom = QR_mat_2_eigenvectors_copy.values[(QR_mat_2_eigenvectors_copy.m - 1) * QR_mat_2_eigenvectors_copy.n + c];
+        double complex denom = QR_mat_2_eigenvectors_copy.values[(QR_mat_2_eigenvectors_copy.m - 1) * QR_mat_2_eigenvectors_copy.n + c];
 
         for (size_t r = 0; r < QR_mat_2_eigenvectors_copy.m; ++r)
         {

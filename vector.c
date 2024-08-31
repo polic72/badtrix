@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <complex.h>
 #include <string.h>
 
 #include "extras.h"
 #include "vector.h"
 
 
-bool vector_add_value(vector *dest, const vector *a, double x)
+bool vector_add_value(vector *dest, const vector *a, double complex x)
 {
     if (dest->n != a->n)
     {
@@ -44,7 +45,7 @@ bool vector_add_vector(vector *dest, const vector *a, const vector *b)
 }
 
 
-bool vector_subtract_value(vector *dest, const vector *a, double x)
+bool vector_subtract_value(vector *dest, const vector *a, double complex x)
 {
     if (dest->n != a->n)
     {
@@ -80,7 +81,7 @@ bool vector_subtract_vector(vector *dest, const vector *a, const vector *b)
 }
 
 
-bool vector_multiply_value(vector *dest, const vector *a, double x)
+bool vector_multiply_value(vector *dest, const vector *a, double complex x)
 {
     if (dest->n != a->n)
     {
@@ -98,7 +99,7 @@ bool vector_multiply_value(vector *dest, const vector *a, double x)
 }
 
 
-bool vector_dot(double *dot, const vector *a, const vector *b)
+bool vector_dot(double complex *dot, const vector *a, const vector *b)
 {
     if (a->n != b->n)
     {
@@ -106,7 +107,7 @@ bool vector_dot(double *dot, const vector *a, const vector *b)
     }
 
 
-    double sum = 0;
+    double complex sum = 0;
     for (int i = 0; i < a->n; ++i)
     {
         sum += a->values[i] * b->values[i];
@@ -138,7 +139,7 @@ bool vector_cross(vector *dest, ...)
 }
 
 
-size_t vector_to_str(char* output, size_t output_size, vector* v, short decimals)
+size_t vector_to_str(char* output, size_t output_size, const vector* v, short decimals)
 {
     int max_size = -1;
 
@@ -146,7 +147,7 @@ size_t vector_to_str(char* output, size_t output_size, vector* v, short decimals
     {
         char temp_num[32];
 
-        double_nice_str(temp_num, 32, v->values[i], decimals);
+        complex_nice_str(temp_num, 32, v->values[i], decimals);
 
         short num_size = strlen(temp_num);
 
@@ -226,7 +227,7 @@ size_t vector_to_str(char* output, size_t output_size, vector* v, short decimals
 
         char temp_num[32];
 
-        double_nice_str_10dec(temp_num, 32, v->values[i]);
+        complex_nice_str_10dec(temp_num, 32, v->values[i]);
 
         short num_size = strlen(temp_num);
         short half_size = (max_size - num_size) / 2;

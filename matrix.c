@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <complex.h>
 #include <string.h>
 #include <math.h>
 
@@ -38,7 +39,7 @@ bool matrix_create_identity(matrix* dest)
 }
 
 
-bool matrix_create_identity_scaled(matrix* dest, double scale)
+bool matrix_create_identity_scaled(matrix* dest, double complex scale)
 {
     if (dest->m != dest->n)
     {
@@ -79,7 +80,7 @@ bool matrix_create_zeros(matrix* dest)
 
 
 //Mathematic Operations:
-bool matrix_add_value(matrix* dest, const matrix* a, double x)
+bool matrix_add_value(matrix* dest, const matrix* a, double complex x)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -124,7 +125,7 @@ bool matrix_add_matrix(matrix* dest, const matrix* a, const matrix* b)
 }
 
 
-bool matrix_subtract_value(matrix* dest, const matrix* a, double x)
+bool matrix_subtract_value(matrix* dest, const matrix* a, double complex x)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -169,7 +170,7 @@ bool matrix_subtract_matrix(matrix* dest, const matrix* a, const matrix* b)
 }
 
 
-bool matrix_multiply_value(matrix* dest, const matrix* a, double x)
+bool matrix_multiply_value(matrix* dest, const matrix* a, double complex x)
 {
     if (dest->m != a->m && dest->n != a->n)
     {
@@ -246,7 +247,7 @@ bool matrix_multiply_vector(vector* dest, const matrix* a, const vector* v)
 
 
 //Sub Operations:
-bool matrix_determinant(double* dest, const matrix* a)
+bool matrix_determinant(double complex* dest, const matrix* a)
 {
     if (a->m != a->n)
     {
@@ -279,12 +280,12 @@ bool matrix_determinant(double* dest, const matrix* a)
     }
 
 
-    double old = *dest;
+    double complex old = *dest;
     *dest = 0;
 
     for (size_t c = 0; c < a->n; ++c)
     {
-        double temp;
+        double complex temp;
         if (!matrix_get_cofactor(&temp, a, 0, c))
         {
             *dest = old;
@@ -299,7 +300,7 @@ bool matrix_determinant(double* dest, const matrix* a)
 }
 
 
-bool matrix_get_cofactor(double* dest, const matrix* a, size_t row, size_t column)
+bool matrix_get_cofactor(double complex* dest, const matrix* a, size_t row, size_t column)
 {
     if (!matrix_get_minor(dest, a, row, column))
     {
@@ -373,13 +374,13 @@ bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t colum
     }
 
 
-    double negative_s_spot = a->values[row * a->n + column];
-    double c_spot = a->values[column * a->n + column];
+    double complex negative_s_spot = a->values[row * a->n + column];
+    double complex c_spot = a->values[column * a->n + column];
 
-    double denominator = sqrt(negative_s_spot * negative_s_spot + c_spot * c_spot);
+    double complex denominator = csqrt(negative_s_spot * negative_s_spot + c_spot * c_spot);
 
-    double negative_s = negative_s_spot / denominator;
-    double c = c_spot / denominator;
+    double complex negative_s = negative_s_spot / denominator;
+    double complex c = c_spot / denominator;
 
 
     for (size_t r = 0; r < givens->m; ++r)
@@ -401,7 +402,7 @@ bool matrix_get_givens(matrix* givens, const matrix* a, size_t row, size_t colum
 }
 
 
-bool matrix_get_minor(double* dest, const matrix* a, size_t row, size_t column)
+bool matrix_get_minor(double complex* dest, const matrix* a, size_t row, size_t column)
 {
     if (row < 0 || row >= a->m)
     {
@@ -415,7 +416,7 @@ bool matrix_get_minor(double* dest, const matrix* a, size_t row, size_t column)
 
 
     matrix minor_matrix;
-    minor_matrix.values = malloc((a->m - 1) * (a->n - 1) * sizeof(double));
+    minor_matrix.values = malloc((a->m - 1) * (a->n - 1) * sizeof(double complex));
     minor_matrix.m = a->m - 1;
     minor_matrix.n = a->n - 1;
 
@@ -602,12 +603,12 @@ bool matrix_inverse(matrix* dest, const matrix* a)
     }
 
 
-    double determinant = 0;
+    double complex determinant = 0;
 
     for (size_t rc = 0; rc < dest->m; ++rc)
     {
         //Here it's the r...
-        double val = dest->values[rc * dest->n];
+        double complex val = dest->values[rc * dest->n];
 
         //...and here it's the c.
         determinant += val * a->values[rc];
@@ -697,7 +698,7 @@ bool matrix_transpose(matrix* dest, const matrix* a)
             }
 
             //We need to do this just in case we're doing an in-place transpose.
-            double temp = a->values[r * a->m + c];
+            double complex temp = a->values[r * a->m + c];
 
             dest->values[r * a->m + c] = a->values[c * a->n + r];
             dest->values[c * a->n + r] = temp;
@@ -736,7 +737,7 @@ int matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
     temp_matrix.m = a->m;
     temp_matrix.n = a->n;
 
-    double temp_mat_vals[temp_matrix.m * temp_matrix.n];
+    double complex temp_mat_vals[temp_matrix.m * temp_matrix.n];
     temp_matrix.values = temp_mat_vals;
 
 
@@ -746,7 +747,7 @@ int matrix_triangle_upper(matrix* dest, const matrix* a, matrix givens[])
     {
         for (size_t c = 0; c < r; ++c)
         {
-            if (fabs(dest->values[r * dest->n + c]) < 0.000000000000001)
+            if (cabs(dest->values[r * dest->n + c]) < 0.000000000000001)
             {
                 //Skip the identity givens.
                 continue;
@@ -799,7 +800,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
     temp_matrix.m = a->m;
     temp_matrix.n = a->n;
 
-    double temp_vals[temp_matrix.m * temp_matrix.n];
+    double complex temp_vals[temp_matrix.m * temp_matrix.n];
     temp_matrix.values = temp_vals;
 
 
@@ -810,7 +811,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         givens[j].m = a->m;
         givens[j].n = a->n;
 
-        givens[j].values = malloc(givens[j].m * givens[j].n * sizeof(double));
+        givens[j].values = malloc(givens[j].m * givens[j].n * sizeof(double complex));
     }
 
 
@@ -821,7 +822,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
     a_i.m = a->m;
     a_i.n = a->n;
 
-    double a_i_vals[a_i.m * a_i.n];
+    double complex a_i_vals[a_i.m * a_i.n];
     a_i.values = a_i_vals;
 
     matrix_copy_to(&a_i, a);
@@ -831,13 +832,13 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
     a_super.m = a->m;
     a_super.n = a->n;
 
-    double a_super_vals[a_super.m * a_super.n];
+    double complex a_super_vals[a_super.m * a_super.n];
     a_super.values = a_super_vals;
 
     matrix_copy_to(&a_super, a);
 
 
-    double mu = 0;
+    double complex mu = 0;
 
     for (size_t i = 0; i < max_iterations; ++i)
     {
@@ -845,7 +846,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         //temp_matrix_aI.m = a_i.m;
         //temp_matrix_aI.n = a_i.n;
 
-        //double temp_matrix_aI_vals[temp_matrix_aI.m * temp_matrix_aI.n];
+        //double complex temp_matrix_aI_vals[temp_matrix_aI.m * temp_matrix_aI.n];
         //temp_matrix_aI.values = temp_matrix_aI_vals;
 
         //You can reset the size of the temp matrix to make things work. Get that mu goin.
@@ -855,7 +856,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         R.m = a_i.m;
         R.n = a_i.n;
 
-        double R_vals[R.m * R.n];
+        double complex R_vals[R.m * R.n];
         R.values = R_vals;
 
 
@@ -866,7 +867,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         Q.m = a_i.m;
         Q.n = a_i.n;
 
-        double Q_vals[Q.m * Q.n];
+        double complex Q_vals[Q.m * Q.n];
         Q.values = Q_vals;
 
         switch (num_givens)
@@ -918,7 +919,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
     schur_converter.m = a_i.m;
     schur_converter.n = a_i.n;
 
-    double schur_converter_vals[schur_converter.m * schur_converter.n];
+    double complex schur_converter_vals[schur_converter.m * schur_converter.n];
     schur_converter.values = schur_converter_vals;
 
     matrix_create_identity(&schur_converter);
@@ -930,7 +931,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         inner_temp_matrix.m = c;
         inner_temp_matrix.n = c;
 
-        double inner_temp_matrix_vals[inner_temp_matrix.m * inner_temp_matrix.n];
+        double complex inner_temp_matrix_vals[inner_temp_matrix.m * inner_temp_matrix.n];
         inner_temp_matrix.values = inner_temp_matrix_vals;
 
 
@@ -938,7 +939,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         upper_biased_factor.m = c;
         upper_biased_factor.n = c;
 
-        double upper_biased_factor_vals[upper_biased_factor.m * upper_biased_factor.n];
+        double complex upper_biased_factor_vals[upper_biased_factor.m * upper_biased_factor.n];
         upper_biased_factor.values = upper_biased_factor_vals;
 
 
@@ -949,7 +950,7 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         sub_temp_matrix.m = c;
         sub_temp_matrix.n = c;
 
-        double sub_temp_matrix_vals[sub_temp_matrix.m * sub_temp_matrix.n];
+        double complex sub_temp_matrix_vals[sub_temp_matrix.m * sub_temp_matrix.n];
         sub_temp_matrix.values = sub_temp_matrix_vals;
 
 
@@ -966,14 +967,14 @@ bool matrix_decompose_eigens(eigen_decomp* dest, const matrix* a, size_t max_ite
         vector temp_vector;
         temp_vector.n = c;
 
-        double temp_vector_vals[temp_vector.n];
+        double complex temp_vector_vals[temp_vector.n];
         temp_vector.values = temp_vector_vals;
 
 
         vector column_vector;
         column_vector.n = c;
 
-        double column_vector_vals[column_vector.n];
+        double complex column_vector_vals[column_vector.n];
         column_vector.values = column_vector_vals;
 
         matrix_get_column_length(&column_vector, &a_i, c, 0, c);
@@ -1031,7 +1032,7 @@ size_t matrix_to_str(char* output, size_t output_size, const matrix* a, short de
         {
             char temp_num[32];
 
-            double_nice_str(temp_num, 32, a->values[r * a->n + c], decimals);
+            complex_nice_str(temp_num, 32, a->values[r * a->n + c], decimals);
 
             short num_size = strlen(temp_num);
 
@@ -1114,7 +1115,7 @@ size_t matrix_to_str(char* output, size_t output_size, const matrix* a, short de
         {
             char temp_num[32];
 
-            double_nice_str(temp_num, 32, a->values[r * a->n + c], decimals);
+            complex_nice_str(temp_num, 32, a->values[r * a->n + c], decimals);
 
             short num_size = strlen(temp_num);
             short half_size = (max_sizes[c] - num_size) / 2;
