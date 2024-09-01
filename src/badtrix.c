@@ -2,15 +2,16 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <complex.h>
+#include <check.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>
 
 //#include <check.h>    //I'm eventually going to use automake and do all that junk, but I'm fine with just a main file for now.
 
-#include "extras.h"
-#include "matrix.h"
-#include "vector.h"
+#include "../include/extras.h"
+#include "../include/matrix.h"
+#include "../include/vector.h"
 
 
 double quick_random_double()

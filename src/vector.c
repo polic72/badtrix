@@ -5,8 +5,8 @@
 #include <complex.h>
 #include <string.h>
 
-#include "extras.h"
-#include "vector.h"
+#include "../include/extras.h"
+#include "../include/vector.h"
 
 
 bool vector_add_value(vector *dest, const vector *a, double complex x)

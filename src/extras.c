@@ -1,9 +1,9 @@
-#include <complex.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <complex.h>
 #include <math.h>
 
-#include "extras.h"
+#include "../include/extras.h"
 
 
 size_t double_nice_str(char* output, size_t output_size, double val, short decimals)

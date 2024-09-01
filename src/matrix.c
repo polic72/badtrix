@@ -6,8 +6,8 @@
 #include <string.h>
 #include <math.h>
 
-#include "extras.h"
-#include "matrix.h"
+#include "../include/extras.h"
+#include "../include/matrix.h"
 
 
 //Creational Operations:

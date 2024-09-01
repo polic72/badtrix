@@ -1,7 +1,7 @@
 PROG = badtrix
-OBJS = $(PROG).o extras.o matrix.o vector.o
+OBJS = obj/$(PROG).o obj/extras.o obj/matrix.o obj/vector.o
 
-DOC = html
+DOC = doc/html
 
 CC = gcc
 CFLAGS = 
@@ -9,19 +9,24 @@ LIBS =
 
 
 #all : $(PROG) $(DOC)
-all : $(PROG)
+all : bin/$(PROG)
 
 
-$(PROG) : $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(PROG) $(LIBS) -Wall -lm
+bin/$(PROG) : $(OBJS)
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(OBJS) -o bin/$(PROG) $(LIBS) -Wall -lm
+	ln -s bin/$(PROG) $(PROG)
 
 $(DOC) : Doxyfile *.c
 	doxygen
 
-%.o : %.c
-	$(CC) $(CFLAGS) -c $< $(LIBS)
+obj/%.o : src/%.c
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o "$@" $(LIBS)
 
 
 clean:
 	rm -f $(OBJS) $(PROG)
 	rm -rf $(DOC)
+	rm -rf bin
+	rm -rf obj
