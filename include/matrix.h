@@ -2,8 +2,10 @@
 #define MATRIX_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <complex.h>
+#include <math.h>
 
 #include "vector.h"
 

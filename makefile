@@ -6,10 +6,15 @@ DOC = doc/html
 CC = gcc
 CFLAGS = 
 LIBS = 
+DEBUGFLAGS = 
 
 
 #all : $(PROG) $(DOC)
 all : bin/$(PROG)
+
+
+debug : CFLAGS += -DDEBUG -g -O
+debug : all
 
 
 bin/$(PROG) : $(OBJS)
@@ -22,7 +27,7 @@ $(DOC) : Doxyfile *.c
 
 obj/%.o : src/%.c
 	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o "$@" $(LIBS)
+	$(CC) $(CFLAGS) -c $< -o "$@" $(DEBUGFLAGS) $(LIBS) -Wall -lm
 
 
 clean:
